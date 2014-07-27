@@ -1,7 +1,38 @@
 #include <Wire.h>
 
-#define min(a, b) ((a)<(b)?(a):(b))
-#define max(a, b) ((a)>(b)?(a):(b))
+class TWIInterface
+{
+  static uint8_t *raw_data;
+  static uint8_t raw_data_size;
+
+  public:
+  static void setupReceive(uint8_t *data, uint8_t size);
+  static void receive(int numBytes);
+};
+
+uint8_t *TWIInterface::raw_data;
+uint8_t TWIInterface::raw_data_size;
+
+void TWIInterface::setupReceive(uint8_t *data, uint8_t size)
+{
+  raw_data = data;
+  raw_data_size = size;
+  Wire.onReceive(TWIInterface::receive);
+}
+  
+void TWIInterface::receive(int numBytes)
+{
+  uint8_t i;
+  
+  uint8_t addr = Wire.read();
+  
+  for(i=0;i<numBytes-1;i++)
+  {
+    if(addr+i > raw_data_size)
+      return;
+    raw_data[addr+i] = Wire.read();
+  }
+}
 
 void setMotors(int left, int right)
 {
@@ -28,17 +59,19 @@ void setMotors(int left, int right)
   }
 }
 
+struct
+{
+  uint8_t motors_modified;
+  int16_t motors[2];
+} data;
+
 void setup()
 {
   pinMode(13, OUTPUT);
-  
   Wire.begin(20);
-  Wire.onRequest(request);
-  Wire.onReceive(receive);
   
-  digitalWrite(23, LOW);
-  digitalWrite(22, HIGH);
-
+  TWIInterface::setupReceive((uint8_t *)(&data), sizeof(data));
+  
   // 20kHz PWM copied from Zumo shield library
   TCCR1A = 0b10100000;
   TCCR1B = 0b00010001;
@@ -50,40 +83,12 @@ void setup()
   setMotors(0,0);
 }
 
-uint8_t sensor;
-
 void loop()
 {
-  digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(10);               // wait for a second
-  digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);               // wait for a second
-  sensor = analogRead(A3);
-}
+//  if(bytesAvailable())
+//    readByte();
 
-uint8_t buf[1];
-
-// function that executes whenever data is requested by master
-// this function is registered as an event, see setup()
-void request()
-{
-  buf[0] = 37;
-  Wire.write(buf, 1);
-}
-
-void receive(int numBytes)
-{
-  int16_t speeds[2];
-  uint8_t *raw_speeds = (uint8_t *)speeds;
-  int i;
   
-  for(i=0;i<4;i++)
-  {
-    if(!Wire.available())
-      return;
-    raw_speeds[i] = Wire.read();
-  }
-  digitalWrite(13, HIGH);
-  return;
-  setMotors(speeds[0],speeds[1]);
+  setMotors(data.motors[0],data.motors[1]);
 }
+
