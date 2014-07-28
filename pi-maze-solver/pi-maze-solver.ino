@@ -1,38 +1,5 @@
 #include <Wire.h>
-
-class TWIInterface
-{
-  static uint8_t *raw_data;
-  static uint8_t raw_data_size;
-
-  public:
-  static void setupReceive(uint8_t *data, uint8_t size);
-  static void receive(int numBytes);
-};
-
-uint8_t *TWIInterface::raw_data;
-uint8_t TWIInterface::raw_data_size;
-
-void TWIInterface::setupReceive(uint8_t *data, uint8_t size)
-{
-  raw_data = data;
-  raw_data_size = size;
-  Wire.onReceive(TWIInterface::receive);
-}
-  
-void TWIInterface::receive(int numBytes)
-{
-  uint8_t i;
-  
-  uint8_t addr = Wire.read();
-  
-  for(i=0;i<numBytes-1;i++)
-  {
-    if(addr+i > raw_data_size)
-      return;
-    raw_data[addr+i] = Wire.read();
-  }
-}
+#include "i2c_interface.h"
 
 void setMotors(int left, int right)
 {
@@ -68,9 +35,8 @@ struct
 void setup()
 {
   pinMode(13, OUTPUT);
-  Wire.begin(20);
   
-  TWIInterface::setupReceive((uint8_t *)(&data), sizeof(data));
+  I2cInterface::setupReceive(20, (uint8_t *)(&data), sizeof(data));
   
   // 20kHz PWM copied from Zumo shield library
   TCCR1A = 0b10100000;
