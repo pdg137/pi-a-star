@@ -5,9 +5,9 @@
 uint8_t *I2cInterface::raw_data;
 uint8_t I2cInterface::raw_data_size;
 
-void I2cInterface::setup(uint8_t *data, uint8_t size)
+void I2cInterface::setup(uint8_t address, uint8_t *data, uint8_t size)
 {
-  Wire.begin(20);
+  Wire.begin(address);
   raw_data = data;
   raw_data_size = size;
   Wire.onReceive(I2cInterface::receive);

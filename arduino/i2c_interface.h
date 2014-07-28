@@ -5,6 +5,6 @@ class I2cInterface
   static void receive(int numBytes);
 
   public:
-  static void setup(uint8_t *data, uint8_t size);
+  static void setup(uint8_t address, uint8_t *data, uint8_t size);
 };
 
