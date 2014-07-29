@@ -5,12 +5,19 @@
 uint8_t *I2cInterface::raw_data;
 uint8_t I2cInterface::raw_data_size;
 
-void I2cInterface::setup(uint8_t *data, uint8_t size)
+uint8_t *I2cInterface::raw_report;
+uint8_t I2cInterface::raw_report_size;
+
+void I2cInterface::setup(uint8_t address, uint8_t *data, uint8_t data_size,
+    uint8_t * report, uint8_t report_size)
 {
-  Wire.begin(20);
+  Wire.begin(address);
   raw_data = data;
-  raw_data_size = size;
+  raw_data_size = data_size;
+  raw_report = report;
+  raw_report_size = report_size;
   Wire.onReceive(I2cInterface::receive);
+  Wire.onRequest(I2cInterface::request);
 }
   
 void I2cInterface::receive(int numBytes)
@@ -26,4 +33,7 @@ void I2cInterface::receive(int numBytes)
   }
 }
 
-
+void I2cInterface::request()
+{
+  Wire.write(raw_report, raw_report_size);
+}
