@@ -13,8 +13,8 @@ struct
 {
   int8_t count1;
   int8_t count2;
-  uint32_t errors1;
-  uint32_t errors2;
+  uint32_t error1;
+  uint32_t error2;
 } report;
 
 void setup()
@@ -29,6 +29,10 @@ void setup()
 
 void loop()
 {
+  report.count1 = Encoders::count1;
+  report.count2 = Encoders::count2;
+  report.error1 = Encoders::error1;
+  report.error2 = Encoders::error2;
   Motors::set(data.motors[0],data.motors[1]);
 }
 

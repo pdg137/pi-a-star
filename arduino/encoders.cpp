@@ -8,12 +8,12 @@ uint32_t Encoders::error2 = 0;
 
 uint8_t last11, last12, last21, last22;
 
-// Encoder 1 uses INT0 and INT1
-ISR(INT1_vect,ISR_ALIASOF(INT0_vect));
-ISR(INT0_vect)
+// Encoder 1 uses INT2 and INT3
+ISR(INT3_vect,ISR_ALIASOF(INT2_vect));
+ISR(INT2_vect)
 {
-  uint8_t new11 = ((PIND & 0x01) != 0);
-  uint8_t new12 = ((PIND & 0x02) != 0);
+  uint8_t new11 = ((PIND & 0x08) != 0);
+  uint8_t new12 = ((PIND & 0x04) != 0);
   
   Encoders::count1 += (last11 ^ new12) - (int)(new11 ^ last12);
   
@@ -46,8 +46,8 @@ void Encoders::setup()
   PCICR = 0xff; // turns on pin change interrupts in general
   PCIFR = 0; // clear interrupt flags
   
-  EICRA = 0x05; // set INT0 and INT to interrupt on all edges
-  EIMSK = 0x03; // enable INT0 and INT1
+  EICRA = 0x50; // set INT2 and INT3 to interrupt on all edges
+  EIMSK = 0x0c; // enable INT2 and INT3
   EIFR = 0; // clear interrupt flags
   sei();
 }
