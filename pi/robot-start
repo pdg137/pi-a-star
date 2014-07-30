@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cd `dirname $0`
+
+exec >> /var/log/robot.log
+exec 2>> /var/log/robot.err
+
+pidfile=/var/run/robot.pid
+
+if [ -f $pidfile ]; then
+    if [ -d /proc/`cat $pidfile` ]; then
+        echo "Already running"
+        exit 1
+    fi
+fi
+
+echo "Starting robot..."
+nohup ./robot.rb &
