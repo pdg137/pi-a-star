@@ -2,6 +2,8 @@
 #include "i2c_interface.h"
 #include "motors.h"
 #include "encoders.h"
+#include "follow.h"
+#include "buttons.h"
 
 struct
 {
@@ -22,10 +24,6 @@ struct
   uint8_t detected_left, detected_straight, detected_right;
 } report;
 
-
-uint16_t calibration_min[5] = {40,680,500,680,40};
-uint16_t calibration_max[5] = {960, 920, 920, 920, 960};
-
 void setup()
 {
   pinMode(13, OUTPUT);
@@ -39,99 +37,27 @@ void setup()
   Encoders::setup();
 }
 
-#define limit(x,a,b) (max(min((x),(b)),(a)))
-
-uint8_t follow_line;
-int16_t last_pos;
-uint8_t off_line;
-int32_t off_line_distance;
-uint8_t detect_left_count;
-uint8_t detect_right_count;
-uint8_t detected_intersection;
-int32_t detected_intersection_distance;
-
 void loop()
 {
   Encoders::update();
+  Buttons::update();    
+  Follow::update();
+  
+  report.button_state = (Buttons::button0) +
+    (Buttons::button1 * 2) +
+    (Buttons::button2 * 4);
   report.distance = Encoders::distance;
   report.error1 = Encoders::error1;
   report.error2 = Encoders::error2;
-  
-  uint8_t i;
-  for(i=0;i<5;i++)
-  {
-    report.sensors[i] = (limit(analogRead(i+1),calibration_min[i],calibration_max[i])-calibration_min[i])*(uint32_t)255/(calibration_max[i]-calibration_min[i]);
-  }
-  
-  if(max(max(report.sensors[1],report.sensors[2]),report.sensors[3]) < 20)
-  {
-    // off line
-    report.pos = 0;
-    if(!off_line)
-    {
-      off_line = 1;
-      off_line_distance = Encoders::distance;
-    }
-  }
-  else
-  {
-    off_line = 0;
-    report.pos = (-(int32_t)report.sensors[1]+report.sensors[3])*1000/(report.sensors[1]+report.sensors[2]+report.sensors[3]);
-  }
-  
-  if(report.sensors[0] > 128)
-    detect_left_count += 1;
-  else
-    detect_left_count = 0;
-  if(detect_left_count > 10) // maybe add min distance
-    report.detected_left = 1;
-  if(report.sensors[4] > 128)
-    detect_right_count += 1;
-  else
-    detect_right_count = 0;
-  if(detect_right_count > 10)
-    report.detected_right = 1;
-  
-  if((report.detected_left || report.detected_right) &&
-    !detected_intersection)
-  {
-    detected_intersection = 1;
-    detected_intersection_distance = Encoders::distance;
-  }
-  
-  if(off_line && Encoders::distance - off_line_distance > 600 ||
-    detected_intersection && Encoders::distance - detected_intersection_distance > 600)
-  {
-    report.detected_straight = !off_line;
-    follow_line = 0;
-  }
-  
-  report.button_state = (digitalRead(18) ? 0 : 1) +
-    (digitalRead(15) ? 0 : 2) +
-    (digitalRead(14) ? 0 : 4);
-  
-  if(report.button_state & 2)
-  {
-    off_line = 0;
-    detected_intersection = 0;
-    report.detected_left = report.detected_straight = report.detected_right = 0;
-    follow_line = 1;
-  }
-  
-  if(follow_line)
-  {
-    int32_t diff = last_pos - report.pos;
-    
-    int32_t pid = report.pos/4 - diff;
-    Motors::set(limit(100+pid,0,100), limit(100-pid,0,100));
-    
-    last_pos = report.pos;
-  }
-  else
-  {
-    Motors::set(0,0);
-  }
-
+ 
+   uint8_t i;
+   for(i=0;i<5;i++)
+     report.sensors[i] = Follow::sensors[i];
+   report.pos = Follow::pos;
+   report.detected_left = Follow::detected_left;
+   report.detected_straight = Follow::detected_straight;
+   report.detected_right = Follow::detected_right;
+ 
   if(data.led_state & 1) RXLED1;
   else RXLED0;
   
