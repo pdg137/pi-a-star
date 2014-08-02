@@ -10,7 +10,7 @@ class AStar
   end
 
   def get_report
-    return @i2c.read(20,10).unpack("ccLL")
+    return @i2c.read(20,16).unpack("ccLLCCCCCC")
   end
 
   def set_leds(red,yellow,green)
