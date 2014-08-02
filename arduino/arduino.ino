@@ -19,7 +19,7 @@ struct
   uint8_t button_state;
   uint8_t sensors[5];
   int16_t pos;
-  uint8_t detected_left, detected_right;
+  uint8_t detected_left, detected_straight, detected_right;
 } report;
 
 
@@ -47,8 +47,8 @@ uint8_t off_line;
 int32_t off_line_distance;
 uint8_t detect_left_count;
 uint8_t detect_right_count;
-int32_t detected_left_distance;
-int32_t detected_right_distance;
+uint8_t detected_intersection;
+int32_t detected_intersection_distance;
 
 void loop()
 {
@@ -83,22 +83,27 @@ void loop()
     detect_left_count += 1;
   else
     detect_left_count = 0;
-  if(detect_left_count > 10)
-    detected_left_distance = Encoders::distance;
+  if(detect_left_count > 10) // maybe add min distance
+    report.detected_left = 1;
   if(report.sensors[4] > 128)
     detect_right_count += 1;
   else
     detect_right_count = 0;
   if(detect_right_count > 10)
-    detected_right_distance = Encoders::distance;
+    report.detected_right = 1;
   
-  if(off_line && Encoders::distance - off_line_distance > 600)
+  if((report.detected_left || report.detected_right) &&
+    !detected_intersection)
   {
+    detected_intersection = 1;
+    detected_intersection_distance = Encoders::distance;
+  }
+  
+  if(off_line && Encoders::distance - off_line_distance > 600 ||
+    detected_intersection && Encoders::distance - detected_intersection_distance > 600)
+  {
+    report.detected_straight = !off_line;
     follow_line = 0;
-    
-    // check for exits
-    report.detected_left = (Encoders::distance - detected_left_distance < 1000);
-    report.detected_right = (Encoders::distance - detected_right_distance < 1000);
   }
   
   report.button_state = (digitalRead(18) ? 0 : 1) +
@@ -106,7 +111,12 @@ void loop()
     (digitalRead(14) ? 0 : 4);
   
   if(report.button_state & 2)
+  {
+    off_line = 0;
+    detected_intersection = 0;
+    report.detected_left = report.detected_straight = report.detected_right = 0;
     follow_line = 1;
+  }
   
   if(follow_line)
   {
@@ -116,12 +126,9 @@ void loop()
     Motors::set(limit(100+pid,0,100), limit(100-pid,0,100));
     
     last_pos = report.pos;
-    report.detected_left = report.detected_right = 0;
   }
   else
   {
-    off_line = 0;
-    detected_left_distance = detected_right_distance = 0;
     Motors::set(0,0);
   }
 
