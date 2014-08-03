@@ -6,7 +6,7 @@ class Follow
   static void doFollow();
   static uint8_t sensors[5];
   static int16_t pos;
-  static uint8_t detected_left, detected_straight, detected_right;
+  static uint8_t detected_left, detected_straight, detected_right, detected_end;
   
   static const uint8_t STATE_NONE = -1;  
   static const uint8_t STATE_WAITING = 0;
@@ -18,6 +18,7 @@ class Follow
   
   private:
   static void readSensors();
+  static void checkForEnd();
   static void follow();
   static void turn();
   static void wait();

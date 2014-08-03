@@ -17,12 +17,14 @@ uint8_t detect_left_count;
 uint8_t detect_right_count;
 uint8_t detected_intersection;
 int32_t detected_intersection_distance;
+uint8_t on_dark;
+int32_t on_dark_distance;
 int32_t turn_goal;
 int32_t state_start_millis;
 
 uint8_t Follow::sensors[5];
 int16_t Follow::pos;
-uint8_t Follow::detected_left, Follow::detected_straight, Follow::detected_right;
+uint8_t Follow::detected_left, Follow::detected_straight, Follow::detected_right, Follow::detected_end;
 uint8_t Follow::state;
 
 void Follow::readSensors()
@@ -121,6 +123,7 @@ void Follow::doFollow()
   Encoders::reset();
   off_line = 0;
   detected_intersection = 0;
+  detected_end = 0;
   detected_left = detected_straight = detected_right = 0;
   state = STATE_FOLLOWING;
 }
@@ -139,6 +142,28 @@ void Follow::snap()
   
   if(millis() - state_start_millis > 200)
     state = STATE_WAITING;
+}
+
+void Follow::checkForEnd()
+{   
+  if(min(min(Follow::sensors[1],Follow::sensors[2]),Follow::sensors[3]) > 210)
+  {
+    if(!on_dark)
+    {
+      on_dark = 1;
+      on_dark_distance = Encoders::distance;
+    }
+  }
+  else
+  {
+    on_dark = 0;
+  }
+    
+  if(on_dark && Encoders::distance - on_dark_distance > 400)
+  {
+    detected_end = 1;
+    state = STATE_WAITING;
+  }
 }
 
 void Follow::follow()
@@ -162,6 +187,8 @@ void Follow::follow()
     detected_intersection = 1;
     detected_intersection_distance = Encoders::distance;
   }
+  
+  checkForEnd();
   
   if(off_line && Encoders::distance - off_line_distance > 600 ||
     detected_intersection && Encoders::distance - detected_intersection_distance > 600)

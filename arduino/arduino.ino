@@ -28,7 +28,7 @@ struct
   uint8_t sensors[5];
   int16_t pos;
   uint8_t follow_state;
-  uint8_t detected_left, detected_straight, detected_right;
+  uint8_t detected_left, detected_straight, detected_right, detected_end;
 } report;
 
 void setup()
@@ -94,6 +94,7 @@ void loop()
    report.detected_left = Follow::detected_left;
    report.detected_straight = Follow::detected_straight;
    report.detected_right = Follow::detected_right;
+   report.detected_end = Follow::detected_end;
  
   if(data.led_state & 1) RXLED1;
   else RXLED0;
