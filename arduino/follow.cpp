@@ -94,7 +94,7 @@ void Follow::update()
 void Follow::doTurn(int16_t angle_degrees)
 {
   Encoders::reset();
-  turn_goal = angle_degrees*40/3;
+  turn_goal = angle_degrees*12;
   state = STATE_TURNING;
 }
 

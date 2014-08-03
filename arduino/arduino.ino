@@ -27,6 +27,7 @@ struct
   uint8_t button_state;
   uint8_t sensors[5];
   int16_t pos;
+  uint8_t follow_state;
   uint8_t detected_left, detected_straight, detected_right;
 } report;
 
@@ -89,6 +90,7 @@ void loop()
    for(i=0;i<5;i++)
      report.sensors[i] = Follow::sensors[i];
    report.pos = Follow::pos;
+   report.follow_state = Follow::state;
    report.detected_left = Follow::detected_left;
    report.detected_straight = Follow::detected_straight;
    report.detected_right = Follow::detected_right;
