@@ -6,6 +6,7 @@ int8_t Encoders::count2 = 0;
 uint32_t Encoders::error1 = 0;
 uint32_t Encoders::error2 = 0;
 int32_t Encoders::distance = 0;
+int32_t Encoders::turn = 0;
 
 uint8_t last11, last12, last21, last22;
 
@@ -59,7 +60,8 @@ void Encoders::update()
   cli();
   if(count1 != 0 || count2 != 0)
   {
-    distance += count1+count2;
+    distance += count1 + count2;
+    turn += count1 - count2;
     count1 = count2 = 0;
   }
   sei();
@@ -68,4 +70,5 @@ void Encoders::update()
 void Encoders::reset()
 {
   distance = 0;
+  turn = 0;
 }
