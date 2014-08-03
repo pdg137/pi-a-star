@@ -5,10 +5,16 @@
 #include "follow.h"
 #include "buttons.h"
 
+#define COMMAND_NONE 0
+#define COMMAND_TURN_LEFT 1
+#define COMMAND_TURN_RIGHT 2
+#define COMMAND_TURN_BACK 3
+#define COMMAND_FOLLOW 4
+
 struct
 {
-  uint8_t motors_modified;
-  int16_t motors[2];
+  uint8_t command_modified;
+  uint8_t command;
   uint8_t led_state_modified;
   uint8_t led_state;
 } data;
@@ -35,6 +41,35 @@ void setup()
     (uint8_t *)(&report), sizeof(report));
   Motors::setup(4,5);
   Encoders::setup();
+}
+
+void check_command()
+{
+  uint8_t new_command = 0;
+  
+  cli();
+  if(data.command_modified)
+  {
+    new_command = data.command;
+    data.command_modified = 0;
+  }
+  sei();
+  
+  switch(new_command)
+  {
+  case COMMAND_TURN_LEFT:
+    Follow::doTurn(-90);
+    break;
+  case COMMAND_TURN_RIGHT:
+    Follow::doTurn(90);
+    break;
+  case COMMAND_TURN_BACK:
+    Follow::doTurn(-180);
+    break;
+  case COMMAND_FOLLOW:
+    Follow::doFollow();
+    break;
+  }
 }
 
 void loop()
@@ -66,5 +101,7 @@ void loop()
   
   if(data.led_state & 4) TXLED1;
   else TXLED0;
+  
+  check_command();
 }
 

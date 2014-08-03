@@ -93,6 +93,7 @@ void Follow::update()
 
 void Follow::doTurn(int16_t angle_degrees)
 {
+  Encoders::reset();
   turn_goal = angle_degrees*40/3;
   state = STATE_TURNING;
 }
@@ -115,21 +116,25 @@ void Follow::turn()
   }
 }
 
+void Follow::doFollow()
+{ 
+  Encoders::reset();
+  off_line = 0;
+  detected_intersection = 0;
+  detected_left = detected_straight = detected_right = 0;
+  state = STATE_FOLLOWING;
+}
+
 void Follow::wait()
 {
   Motors::set(0,0);
   
   if(Buttons::button1)
   {
-    Encoders::reset();
-    off_line = 0;
-    detected_intersection = 0;
-    detected_left = detected_straight = detected_right = 0;
-    state = STATE_FOLLOWING;
+    doFollow();
   }
   else if(Buttons::button2)
   {
-     Encoders::reset();
      doTurn(90);
   }
 }
