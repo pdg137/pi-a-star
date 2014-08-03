@@ -128,15 +128,6 @@ void Follow::doFollow()
 void Follow::wait()
 {
   Motors::set(0,0);
-  
-  if(Buttons::button1)
-  {
-    doFollow();
-  }
-  else if(Buttons::button2)
-  {
-     doTurn(90);
-  }
 }
 
 void Follow::snap()
