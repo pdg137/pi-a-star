@@ -3,7 +3,7 @@ require_relative 'a_star'
 a_star = AStar.new
 
 while true
-  sensors = [0,0,0,0,0]
-  print "#{distance} #{errors1} #{errors2} #{buttons} #{sensors} #{pos} #{left} #{straight} #{right}     \r"
+  report = a_star.get_report
+  print "#{report.distance} #{report.follow_state} #{report.left} #{report.straight} #{report.right}     \r"
   sleep(0.1)
 end

@@ -27,7 +27,7 @@ class AStar
   end
 
   def get_raw_report
-    return @i2c.read(20,23).unpack("lLLCCCCCCsccc")
+    return @i2c.read(20,24).unpack("lLLCCCCCCscccc")
   end
 
   def get_report
@@ -35,7 +35,8 @@ class AStar
     (report.distance, report.errors1, report.errors2, report.buttons,
      report.sensors[0], report.sensors[1], report.sensors[2],
      report.sensors[3], report.sensors[4],
-     report.pos, report.left, report.straight, report.right) = get_raw_report
+     report.pos, report.follow_state,
+     report.left, report.straight, report.right) = get_raw_report
     report
   end
 
