@@ -1,5 +1,6 @@
 require 'i2c'
 require_relative 'a_star_report'
+require_relative 'follow'
 
 class AStar
   def initialize
@@ -22,12 +23,12 @@ class AStar
     send_command(3)
   end
 
-  def follow
+  def send_follow_command
     send_command(4)
   end
 
   def get_raw_report
-    return @i2c.read(20,24).unpack("lLLCCCCCCscccc")
+    return @i2c.read(20,25).unpack("lLLCCCCCCsccccc")
   end
 
   def get_report
@@ -36,7 +37,8 @@ class AStar
      report.sensors[0], report.sensors[1], report.sensors[2],
      report.sensors[3], report.sensors[4],
      report.pos, report.follow_state,
-     report.left, report.straight, report.right) = get_raw_report
+     report.left, report.straight, report.right,
+     report.end) = get_raw_report
     report
   end
 
@@ -45,5 +47,9 @@ class AStar
       (yellow ? 2 : 0 ) +
       (green ? 4 : 0)
     @i2c.write(20, [2,1,led].pack("CCC"))
+  end
+
+  def follow
+    return Follow.new(self)
   end
 end

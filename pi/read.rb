@@ -4,6 +4,6 @@ a_star = AStar.new
 
 while true
   report = a_star.get_report
-  print "#{report.distance} #{report.follow_state} #{report.left} #{report.straight} #{report.right}     \r"
+  print "#{report.distance} #{report.sensors}     \r"
   sleep(0.1)
 end
