@@ -1,4 +1,5 @@
 require 'i2c'
+require_relative 'a_star_report'
 
 class AStar
   def initialize
@@ -25,8 +26,17 @@ class AStar
     send_command(4)
   end
 
-  def get_report
+  def get_raw_report
     return @i2c.read(20,23).unpack("lLLCCCCCCsccc")
+  end
+
+  def get_report
+    report = AStarReport.new
+    (report.distance, report.errors1, report.errors2, report.buttons,
+     report.sensors[0], report.sensors[1], report.sensors[2],
+     report.sensors[3], report.sensors[4],
+     report.pos, report.left, report.straight, report.right) = get_raw_report
+    report
   end
 
   def set_leds(red,yellow,green)
