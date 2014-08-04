@@ -70,6 +70,11 @@ class MazeSolver
         result.done { }
       end
     end
+
+    @a_star.follow do |result|
+      result.end { }
+      result.intersection { }
+    end
   end
 end
 
