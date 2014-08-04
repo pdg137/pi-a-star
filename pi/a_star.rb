@@ -1,6 +1,7 @@
 require 'i2c'
 require_relative 'a_star_report'
 require_relative 'follow'
+require_relative 'turn'
 
 class AStar
   def initialize
@@ -49,7 +50,11 @@ class AStar
     @i2c.write(20, [2,1,led].pack("CCC"))
   end
 
-  def follow
-    return Follow.new(self)
+  def follow(&block)
+    return Follow.new(self).call(&block)
+  end
+
+  def turn(dir, &block)
+    Turn.new(self, dir).call(&block)
   end
 end

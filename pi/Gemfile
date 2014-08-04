@@ -1,0 +1,4 @@
+source 'https://rubygems.org'
+
+gem 'response_state'
+gem 'i2c'
