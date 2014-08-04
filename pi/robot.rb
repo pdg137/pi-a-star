@@ -24,6 +24,6 @@ while true
   end
 
   if report.button1?
-    MazeSolver.run(a_star)
+    MazeSolver.new(a_star).run
   end
 end
