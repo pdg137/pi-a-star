@@ -32,54 +32,72 @@ describe Maze do
 
   describe "#solve" do
     it "solves to node 4" do
-      expect(maze.solve(4)).to eq [2,1,1,0]
+      expect(maze.solve(4)).to eq({1=>2,2=>1,3=>1,4=>0})
     end
 
     it "solves to node 1" do
-      expect(maze.solve(1)).to eq [0,1,2,2]
+      expect(maze.solve(1)).to eq({1=>0,2=>1,3=>2,4=>2})
     end
   end
 
   describe "#initial_score" do
     it "sets the target node to 0, others to INF" do
-      expect(maze.initial_score(4)).to eq [INF,INF,INF,0]
-      expect(maze.initial_score(1)).to eq [0,INF,INF,INF]
+      expect(maze.initial_score(4)[1]).to eq INF
+      expect(maze.initial_score(4)[2]).to eq INF
+      expect(maze.initial_score(4)[3]).to eq INF
+      expect(maze.initial_score(4)[4]).to eq 0
+
+      expect(maze.initial_score(1)[1]).to eq 0
     end
   end
 
   describe "#closest" do
     it "returns the only node in a trivial case" do
-      expect(maze.closest([1],[INF,INF,INF,INF])).to eq 1
+      score = {}
+      score.default = INF 
+
+      expect(maze.closest([1],score)).to eq 1
     end
 
     it "returns the node with lowest score" do
-      expect(maze.closest([1,2,3,4],[INF,1,3,2])).to eq 2
+      score = {2=>1,3=>3,4=>2}
+      score.default = INF
+
+      expect(maze.closest([1,2,3,4],score)).to eq 2
     end
   end
 
   describe "#check" do
     specify "given 1, it sets the score on node 2" do
-      score = [0,INF,INF,INF]
+      score = {1=>1}
+      score.default = INF
+
       maze.check(score,1)
-      expect(score).to eq [0,1,INF,INF]
+      expect(score).to eq({1=>1, 2=>2})
     end
 
     specify "it adds 1 to the score" do
-      score = [5,INF,INF,INF]
+      score = {1=>5}
+      score.default = INF
+
       maze.check(score,1)
-      expect(score).to eq [5,6,INF,INF]
+      expect(score).to eq({1=>5, 2=>6})
     end
 
     specify "does not overwrite lower scores" do
-      score = [5,5,INF,INF]
+      score = {1=>5,2=>5}
+      score.default = INF
+
       maze.check(score,1)
-      expect(score).to eq [5,5,INF,INF]
+      expect(score).to eq({1=>5,2=>5})
     end
 
     specify "spreads to all connected nodes" do
-      score = [INF,0,INF,INF]
+      score = {2=>0}
+      score.default = INF
+
       maze.check(score,2)
-      expect(score).to eq [1,0,1,1]
+      expect(score).to eq({1=>1,2=>0,3=>1,4=>1})
     end
   end
 
