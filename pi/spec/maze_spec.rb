@@ -14,6 +14,24 @@ describe Maze do
   }
   let(:maze) { Maze.new(nodes,connections) }
 
+  describe "#path" do
+    it "finds the shortest path" do
+      expect(maze.path(1,4)).to eq [1,2,4]
+    end
+
+    it "returns nil when no path" do
+      maze.add_node(:e)
+      expect(maze.path(:e,4)).to eq nil
+    end
+
+    it "returns nil when no path in a more complicated sitation" do
+      maze.add_node(:e)
+      maze.add_node(:f)
+      maze.add_connections :e => [:f] , :f => [:e]
+      expect(maze.path(:e,4)).to eq nil
+    end
+  end
+
   describe "#solve" do
     it "solves to node 4" do
       expect(maze.solve(4)).to eq [2,1,1,0]
@@ -64,6 +82,13 @@ describe Maze do
       score = [INF,0,INF,INF]
       maze.check(score,2)
       expect(score).to eq [1,0,1,1]
+    end
+  end
+
+  describe "#add_connections" do
+    it "does not add redundant connections" do
+      maze.add_connections 1 => [2]
+      expect(maze.connections[1]).to eq [2]
     end
   end
 end

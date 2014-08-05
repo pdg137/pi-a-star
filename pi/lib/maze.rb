@@ -13,7 +13,7 @@ class Maze
 
   def add_connections(params)
     params.each_pair do |node, neighbors|
-      connections[node] += neighbors
+      connections[node] |= neighbors
     end
   end
 
@@ -48,5 +48,21 @@ class Maze
     connections[node].each do |neighbor|
       score[index neighbor] = score[index node]+1 if score[index neighbor] > score[index node]
     end
+  end
+
+  def path(from_node, to_node)
+    score = solve(to_node)
+
+    return nil if score[index from_node] == INF
+
+    path = [from_node]
+    while path.last != to_node
+      neighbors = connections[path.last]
+      next_node = neighbors.min_by { |x| score[index x] }
+      return nil if next_node.nil?
+      path << next_node
+    end
+
+    path
   end
 end
