@@ -13,7 +13,11 @@ class Point
   end
 
   def ==(other)
-    complex == other.complex
+    if other.is_a? Point
+      complex == other.complex
+    else
+      super other
+    end
   end
 
   def eql?(other)

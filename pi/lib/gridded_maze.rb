@@ -32,13 +32,13 @@ class GriddedMaze < Maze
     vector.assert_cardinal
 
     path = get_path(start, finish)
-    turns = []
 
     last_node = path.shift
     current_node = path.shift
     last_dir = current_node - last_node
 
-    initial_turn = vector.dir_to(last_dir)
+    # initial turn
+    turns = [vector.dir_to(last_dir)]
 
     until path.empty?
       next_node = path.shift
@@ -55,7 +55,7 @@ class GriddedMaze < Maze
       last_dir = next_dir
     end
 
-    {turns: turns, initial_turn: initial_turn}
+    turns
   end
 
   def self.from_s(string)

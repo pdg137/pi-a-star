@@ -55,20 +55,17 @@ END
 
     specify do
       turning_path = maze.get_turning_path Vector(-1,0), Point(1,0), Point(2,1)
-      expect(turning_path[:turns]).to eq [:right, :right]
-      expect(turning_path[:initial_turn]).to eq :straight
+      expect(turning_path).to eq [:straight, :right, :right]
     end
 
     specify do
       turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(1,2)
-      expect(turning_path[:turns]).to eq [:straight, :right]
-      expect(turning_path[:initial_turn]).to eq :straight
+      expect(turning_path).to eq [:straight, :straight, :right]
     end
 
     specify do
       turning_path = maze.get_turning_path Vector(0,-1), Point(0,0), Point(1,2)
-      expect(turning_path[:turns]).to eq [:straight, :right]
-      expect(turning_path[:initial_turn]).to eq :back
+      expect(turning_path).to eq [:back, :straight, :right]
     end
   end
 
@@ -85,11 +82,11 @@ END
 
     specify do
       turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(5,2)
-      expect(turning_path[:turns]).to eq [:straight, :right, :straight, :right, :left, :right, :left, :left]
+      expect(turning_path).to eq [:straight, :straight, :right, :straight, :right, :left, :right, :left, :left]
     end
 
     it "identifies the end" do
-      expect(maze.end).to eq Vector(3,0)
+      expect(maze.end).to eq Point(3,0)
     end
   end
 end

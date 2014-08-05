@@ -2,6 +2,8 @@ require 'maze'
 require 'rspec'
 require 'gridded_maze'
 require 'fake_a_star'
+require 'looped_maze_solver'
+
 require 'byebug'
 
 RSpec.configure do |config|
