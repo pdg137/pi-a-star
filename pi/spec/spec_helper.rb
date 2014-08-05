@@ -1,6 +1,7 @@
 require 'maze'
 require 'rspec'
 require 'gridded_maze'
+require 'byebug'
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true

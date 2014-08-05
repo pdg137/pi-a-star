@@ -1,3 +1,5 @@
+INF = Float::INFINITY
+
 class Maze
   attr_reader :nodes, :connections
   def initialize(nodes = [], connections = {})
@@ -15,6 +17,10 @@ class Maze
     params.each_pair do |node, neighbors|
       connections[node] |= neighbors
     end
+  end
+
+  def connect(node1, node2)
+    add_connections node1 => [node2], node2 => [node1]
   end
 
   def solve(goal)
@@ -50,7 +56,7 @@ class Maze
     end
   end
 
-  def path(from_node, to_node)
+  def get_path(from_node, to_node)
     score = solve(to_node)
 
     return nil if score[index from_node] == INF

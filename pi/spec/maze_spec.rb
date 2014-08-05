@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-INF = Float::INFINITY
-
 describe Maze do
   let(:nodes) { [1,2,3,4] }
   let(:connections) {
@@ -14,21 +12,21 @@ describe Maze do
   }
   let(:maze) { Maze.new(nodes,connections) }
 
-  describe "#path" do
+  describe "#get_path" do
     it "finds the shortest path" do
-      expect(maze.path(1,4)).to eq [1,2,4]
+      expect(maze.get_path(1,4)).to eq [1,2,4]
     end
 
     it "returns nil when no path" do
       maze.add_node(:e)
-      expect(maze.path(:e,4)).to eq nil
+      expect(maze.get_path(:e,4)).to eq nil
     end
 
     it "returns nil when no path in a more complicated sitation" do
       maze.add_node(:e)
       maze.add_node(:f)
       maze.add_connections :e => [:f] , :f => [:e]
-      expect(maze.path(:e,4)).to eq nil
+      expect(maze.get_path(:e,4)).to eq nil
     end
   end
 
