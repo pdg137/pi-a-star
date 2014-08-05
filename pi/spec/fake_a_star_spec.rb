@@ -68,6 +68,27 @@ END
 
       expect(context[:exits]).to eq [:left,:straight,:back]
     end
+
+    it "can follow to the end" do
+      %i(left right left right left left right straight).each do |turn|
+        subject.follow do |result|
+          result.end { raise }
+          result.intersection { }
+        end
+
+        subject.turn(turn) do |result|
+          result.done { }
+        end
+      end
+
+      found_end = nil
+      subject.follow do |result|
+        result.end { found_end = true }
+        result.intersection { raise }
+      end
+
+      expect(found_end).to eq true
+    end
   end
 end
 

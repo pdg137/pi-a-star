@@ -28,7 +28,13 @@ class FakeAStar
       [:left,:straight,:right,:back].index dir
     end
 
-    response = ResponseState::Response.new(:intersection,
+    status = if maze.end == @pos
+               :end
+             else
+               :intersection
+             end
+
+    response = ResponseState::Response.new(status,
                                            "",
                                            {exits: exits}
                                            )

@@ -79,13 +79,17 @@ END
 |   | |   |
 #-# # #-# #
 | | |   | |
-# #-# #-#-#
+# #-# X-#-#
 END
     }
 
     specify do
       turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(5,2)
       expect(turning_path[:turns]).to eq [:straight, :right, :straight, :right, :left, :right, :left, :left]
+    end
+
+    it "identifies the end" do
+      expect(maze.end).to eq Vector(3,0)
     end
   end
 end

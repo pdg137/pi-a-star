@@ -2,6 +2,8 @@ require_relative 'point'
 require_relative 'vector'
 
 class GriddedMaze < Maze
+  attr_accessor :end
+
   def add_intersection(node, exit_vectors)
     exit_vectors.each do |vector|
       unit = vector.unit
@@ -81,6 +83,11 @@ class GriddedMaze < Maze
         if !odd_x && !odd_y
           # a node
           maze.add_node(Point map_x/2, map_y/2)
+
+          # X marks the end
+          if char == "X"
+            maze.end = Point(map_x/2, map_y/2)
+          end
         elsif odd_x
           # east/west connection
           maze.connect(Point((map_x-1)/2,map_y/2),
