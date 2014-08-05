@@ -26,19 +26,6 @@ class GriddedMaze < Maze
     end
   end
 
-  def self.vectors_to_turn(start, finish)
-    start.assert_cardinal
-    finish.assert_cardinal
-
-    a = [Vector(1,0),Vector(0,1),Vector(-1,0),Vector(0,-1)].index start
-    b = [Vector(1,0),Vector(0,1),Vector(-1,0),Vector(0,-1)].index finish
-
-    left_amount = b - a
-    left_amount += 4 if left_amount < 0
-
-    [:straight, :left, :back, :right][left_amount]
-  end
-
   def get_turning_path(vector, start, finish)
     vector.assert_cardinal
 
@@ -49,7 +36,7 @@ class GriddedMaze < Maze
     current_node = path.shift
     last_dir = current_node - last_node
 
-    initial_turn = GriddedMaze.vectors_to_turn(vector, last_dir)
+    initial_turn = vector.dir_to(last_dir)
 
     until path.empty?
       next_node = path.shift
@@ -58,7 +45,7 @@ class GriddedMaze < Maze
       # skip straights on nodes with no other neighbors since the
       # robot will drive right through them without seeing a node
       if !(connections[current_node].length == 2 && last_dir == next_dir)
-        turns << GriddedMaze.vectors_to_turn(last_dir, next_dir)
+        turns << last_dir.dir_to(next_dir)
       end
 
       last_node = current_node

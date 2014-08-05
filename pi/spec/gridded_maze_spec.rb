@@ -38,29 +38,6 @@ describe "GriddedMaze" do
     end
   end
 
-  describe "vectors_to_turn" do
-    north = Vector 0,1
-    south = Vector 0,-1
-    east = Vector 1,0
-    west = Vector -1,0
-
-    it "identifies a turn from north to west as left" do
-      expect(GriddedMaze.vectors_to_turn(north,west)).to eq :left
-    end
-
-    it "identifies a turn from west to north as right" do
-      expect(GriddedMaze.vectors_to_turn(west,north)).to eq :right
-    end
-
-    it "identifies a turn from west to east as back" do
-      expect(GriddedMaze.vectors_to_turn(west,east)).to eq :back
-    end
-
-    it "identifies a turn from south to south as straight" do
-      expect(GriddedMaze.vectors_to_turn(south,south)).to eq :straight
-    end
-  end
-
   context "simple gridded maze" do
 
     let(:maze) {

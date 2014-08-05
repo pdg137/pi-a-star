@@ -13,11 +13,19 @@ class Vector
   end
 
   def ==(other)
-    complex == other.complex
+    if other.is_a? Vector
+      complex == other.complex
+    else
+      super other
+    end
   end
 
   def eql?(other)
-    complex.eql? other.complex
+    if other.is_a? Vector
+      complex.eql? other.complex
+    else
+      super other
+    end
   end
 
   def unit
@@ -59,6 +67,35 @@ class Vector
   def inspect
     "<#{x},#{y}>"
   end
+
+  def turn(dir)
+    Vector complex*case dir
+                   when :left
+                     Complex::I
+                   when :right
+                     -Complex::I
+                   when :straight
+                     1
+                   when :back
+                     -1
+                   else
+                     raise "invalid dir #{dir}"
+                   end
+  end
+
+  def dir_to(finish)
+    self.assert_cardinal
+    finish.assert_cardinal
+
+    a = [Vector(1,0),Vector(0,1),Vector(-1,0),Vector(0,-1)].index self
+    b = [Vector(1,0),Vector(0,1),Vector(-1,0),Vector(0,-1)].index finish
+
+    left_amount = b - a
+    left_amount += 4 if left_amount < 0
+
+    [:straight, :left, :back, :right][left_amount]
+  end
+
 end
 
 def Vector(*args)
