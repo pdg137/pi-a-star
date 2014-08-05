@@ -68,4 +68,44 @@ class GriddedMaze < Maze
 
     {turns: turns, initial_turn: initial_turn}
   end
+
+  def self.from_s(string)
+    maze = GriddedMaze.new
+
+    lines = string.lines.map &:rstrip
+    raise "need odd number of lines" if lines.length % 2 != 1
+
+    # the last line should be y-coordinate 0
+    lines.reverse!
+
+    lines.each_index do |map_y|
+      line = lines[map_y]
+      line.length.times do |map_x|
+        odd_y = (map_y % 2 == 1)
+        odd_x = (map_x % 2 == 1)
+        char = line[map_x]
+
+        # skip blanks
+        blank = (char == " ")
+        next if blank
+
+        raise "non-blank char #{char} at #{map_x}, #{map_y}" if odd_x && odd_y
+
+        if !odd_x && !odd_y
+          # a node
+          maze.add_node(Point map_x/2, map_y/2)
+        elsif odd_x
+          # east/west connection
+          maze.connect(Point((map_x-1)/2,map_y/2),
+                       Point((map_x+1)/2,map_y/2))
+        else
+          # north/south connection
+          maze.connect(Point(map_x/2,(map_y-1)/2),
+                       Point(map_x/2,(map_y+1)/2))
+        end
+      end
+    end
+
+    maze
+  end
 end

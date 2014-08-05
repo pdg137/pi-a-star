@@ -62,53 +62,53 @@ describe "GriddedMaze" do
   end
 
   context "simple gridded maze" do
-    # #-#-#
-    # |   |
-    # #-#-#
-    # |
-    # #-#
 
-    let(:maze) { GriddedMaze.new }
-
-    before do
-      [[0,2], [1,2], [2,2],
-       [0,1], [1,1], [2,1],
-       [0,0], [1,0]].each do |node|
-        maze.add_node node
-      end
-
-      maze.connect Point(0,0), Point(1,0)
-
-      maze.connect Point(0,0), Point(0,1)
-      maze.connect Point(0,1), Point(1,1)
-      maze.connect Point(1,1), Point(2,1)
-
-      maze.connect Point(0,1), Point(0,2)
-      maze.connect Point(2,1), Point(2,2)
-      maze.connect Point(0,2), Point(1,2)
-      maze.connect Point(1,2), Point(2,2)
-    end
-
+    let(:maze) {
+      GriddedMaze.from_s <<END
+#-#-#
+|   |
+#-#-#
+|
+#-#
+END
+    }
     specify do
       expect(maze.get_path Point(0,0), Point(1,2)).to eq [[0,0],[0,1],[0,2],[1,2]].map { |x| Point.new x }
     end
 
-    it do
+    specify do
       turning_path = maze.get_turning_path Vector(-1,0), Point(1,0), Point(2,1)
       expect(turning_path[:turns]).to eq [:right, :right]
       expect(turning_path[:initial_turn]).to eq :straight
     end
 
-    it do
+    specify do
       turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(1,2)
       expect(turning_path[:turns]).to eq [:straight, :right]
       expect(turning_path[:initial_turn]).to eq :straight
     end
 
-    it do
+    specify do
       turning_path = maze.get_turning_path Vector(0,-1), Point(0,0), Point(1,2)
       expect(turning_path[:turns]).to eq [:straight, :right]
       expect(turning_path[:initial_turn]).to eq :back
+    end
+  end
+
+  context "more complicated maze" do
+    let(:maze) {
+      GriddedMaze.from_s <<END
+#-#-#-#-# #
+|   | |   |
+#-# # #-# #
+| | |   | |
+# #-# #-#-#
+END
+    }
+
+    specify do
+      turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(5,2)
+      expect(turning_path[:turns]).to eq [:straight, :right, :straight, :right, :left, :right, :left, :left]
     end
   end
 end

@@ -19,6 +19,8 @@ class Maze
   end
 
   def connect(node1, node2)
+    add_node node1
+    add_node node2
     add_connections node1 => [node2], node2 => [node1]
   end
 
