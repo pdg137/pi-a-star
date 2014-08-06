@@ -21,6 +21,13 @@ END
 
       subject.explore_to_end
       expect(fake_a_star.pos).to eq fake_a_star.maze.end
+
+      subject.explore_entire_maze
+      expect(fake_a_star.maze.nodes).to eq subject.maze.nodes
+
+      fake_a_star.goto Point(0,0), Vector(1,0)
+      subject.replay_from_zero
+      expect(fake_a_star.pos).to eq fake_a_star.maze.end
     end
 
     it "solves the maze starting from a dead end" do

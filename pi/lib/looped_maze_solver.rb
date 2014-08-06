@@ -9,10 +9,14 @@ class LoopedMazeSolver
   # Updated as we explore it.
   attr_reader :maze, :pos, :vec, :explored_nodes, :a_star
 
-  def initialize(a_star)
-    @a_star = a_star
+  def set_initial_position
     @pos = Point(0,0)
     @vec = Vector(1,0)
+  end
+
+  def initialize(a_star)
+    @a_star = a_star
+    set_initial_position
     @explored_nodes = Set.new
     @maze = GriddedMaze.new
 
@@ -69,6 +73,7 @@ class LoopedMazeSolver
         result.done {
           @vec = vec.turn(turn)
         }
+        result.button { raise }
       end
 
       puts "follow"
@@ -81,15 +86,26 @@ class LoopedMazeSolver
         result.intersection {
           record_intersection(result.context)
         }
+        result.button { raise }
       end
 
     end
   end
 
   def explore_to_end
-    puts "\n\nSTARTING NEW EXPLORATION FROM #{pos}\n"
+    explore(true)
+  end
 
-    while pos != maze.end
+  def explore_entire_maze
+    explore(false)
+  end
+
+  def explore(stop_on_end)
+    puts "\n\STARTING EXPLORATION FROM #{pos}\n"
+
+    while true
+      break if stop_on_end && pos == maze.end
+
       distances_from_pos = maze.solve(pos)
 
       closest_unexplored_node = unexplored_other_nodes.min_by { |node|
@@ -102,5 +118,9 @@ class LoopedMazeSolver
       explore_to closest_unexplored_node
     end
   end
-end
 
+  def replay_from_zero
+    set_initial_position
+    explore_to maze.end
+  end
+end

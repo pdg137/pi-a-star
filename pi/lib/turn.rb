@@ -26,6 +26,8 @@ class Turn < ResponseState::Service
       sleep(0.1)
     end
 
-    yield send_state(:done)
+    state = :done
+
+    yield send_state(state)
   end
 end

@@ -8,6 +8,37 @@ require_relative 'lib/looped_maze_solver'
 
 a_star = AStar.new
 
+def do_maze_solving(a_star)
+  solver = LoopedMazeSolver.new(a_star)
+  a_star.set_leds(false, false, true)
+  sleep(0.5)
+  a_star.set_leds(false, false, false)
+  sleep(0.5)
+
+  solver.explore_to_end
+  a_star.set_leds(true, true, true)
+  sleep(1)
+  a_star.set_leds(false, false, false)
+
+  solver.explore_entire_maze
+
+  while true
+    report = a_star.get_report
+
+    break if report.button2?
+
+    if report.button1?
+      a_star.set_leds(true, true, true)
+      sleep(0.5)
+      a_star.set_leds(false, false, false)
+      sleep(0.5)
+      solver.replay_from_zero
+    end
+
+    sleep(0.1)
+  end
+end
+
 while true
   a_star.set_leds(true,false,false)
   sleep 0.2
@@ -18,12 +49,12 @@ while true
 
   sensors = [0,0,0,0,0]
   report = a_star.get_report
-  if report.buttons & 1 == 1
+  if report.button0?
     puts "Power button pressed - executing 'halt'..."
     system("halt")
   end
 
   if report.button1?
-    LoopedMazeSolver.new(a_star).explore_to_end
+    do_maze_solving(a_star)
   end
 end

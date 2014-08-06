@@ -22,6 +22,10 @@ class Follow < ResponseState::Service
               :intersection
             end
 
+    if report.button2?
+      state = :button
+    end
+
     yield send_state(state, '', context)
   end
 end
