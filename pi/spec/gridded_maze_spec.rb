@@ -75,8 +75,8 @@ END
   end
 
   context "more complicated maze" do
-    let(:maze) {
-      GriddedMaze.from_s <<END
+    let(:map) {
+      <<END
 #-#-#-#-# #
 |   | |   |
 #-# # #-# #
@@ -84,6 +84,21 @@ END
 # #-# X-#-#
 END
     }
+    let(:maze) { GriddedMaze.from_s map }
+
+    specify do
+      expect(maze.to_s).to eq map
+    end
+
+    specify do
+      expect(maze.to_s(Point(1,1))).to eq <<END
+#-#-#-#-# #
+|   | |   |
+#-@ # #-# #
+| | |   | |
+# #-# X-#-#
+END
+    end
 
     specify do
       turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(5,2)

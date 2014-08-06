@@ -49,9 +49,12 @@ class LoopedMazeSolver
     units.times.each do
       old_pos = pos
       @pos += vec
+
       puts "at #{pos} #{vec}"
 
       connect(old_pos, pos)
+
+      puts maze.to_s(pos)
 
       explored_nodes << pos
     end

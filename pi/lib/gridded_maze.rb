@@ -105,4 +105,37 @@ class GriddedMaze < Maze
 
     maze
   end
+
+  def to_s(pos = nil)
+    min_x = nodes.map(&:x).min
+    min_y = nodes.map(&:y).min
+    max_x = nodes.map(&:x).max
+    max_y = nodes.map(&:y).max
+
+    lines = []
+    (min_y..max_y).each do |y|
+      # draw the nodes
+      lines << (min_x..max_x).collect do |x|
+        (Point(x,y) == pos ? "@" : (Point(x,y) == self.end ? "X" : (nodes.include?(Point(x,y)) ? "#" : " ")))+
+          if connections[Point(x,y)].include? Point(x+1,y)
+            "-"
+          else
+            " "
+          end
+      end.join.rstrip
+
+      if(y != max_y)
+        # draw vertical connections
+        lines << (min_x..max_x).collect do |x|
+          if connections[Point(x,y)].include? Point(x,y+1)
+            "|"
+          else
+            " "
+          end+" "
+        end.join.rstrip
+      end
+    end
+
+    lines.reverse.join("\n")+"\n"
+  end
 end
