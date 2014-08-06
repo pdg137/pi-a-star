@@ -41,13 +41,19 @@ class FakeAStar
       end
     end
 
+    # the robot seems to detect exits on an end spot
+    # this will force us to ignore them
+    if maze.end == @pos
+      exits = [:left,:straight,:right,:back]
+    end
+
     status = if maze.end == @pos
                :end
              else
                :intersection
              end
 
-    distance = (@pos - original_pos).length * 280 * 6 + (rand(60) - 30)
+    distance = (@pos - original_pos).length * 300 * 6 + (rand(60) - 30)
 
     response = ResponseState::Response.new(status,
                                            "",

@@ -1,4 +1,4 @@
-require_relative 'a_star'
+require_relative 'lib/a_star'
 
 a_star = AStar.new
 
