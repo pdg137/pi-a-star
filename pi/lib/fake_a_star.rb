@@ -47,7 +47,7 @@ class FakeAStar
                :intersection
              end
 
-    distance = (@pos - original_pos).length * 280 * 6 + (rand(60) - 30)
+    distance = (@pos - original_pos).length * 300 * 6 + (rand(60) - 30)
 
     response = ResponseState::Response.new(status,
                                            "",

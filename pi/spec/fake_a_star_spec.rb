@@ -27,7 +27,7 @@ END
     expect {subject.follow {}}.to raise_error FakeAStar::OffLineException
   end
 
-  it "returns approximately 280 ticks per inch" do
+  it "returns approximately 300 ticks per inch" do
     distance = nil
 
     subject.follow do |result|
@@ -35,7 +35,7 @@ END
       result.intersection { distance = result.context[:distance] }
     end
 
-    expect(distance).to be_within(50).of(280*6)
+    expect(distance).to be_within(50).of(300*6)
   end
 
   describe "#turn" do
@@ -58,7 +58,7 @@ END
         result.intersection { context = result.context }
       end
       expect(context[:exits]).to eq [:left, :back]
-      expect(context[:distance]).to be_within(50).of(280*6*3)
+      expect(context[:distance]).to be_within(50).of(300*6*3)
     end
 
     specify do

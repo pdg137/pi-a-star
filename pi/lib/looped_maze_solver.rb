@@ -33,7 +33,7 @@ class LoopedMazeSolver
   end
 
   def estimate_grid_units(distance)
-    (distance + 3*280)/(6*280)
+    (distance + 3*300)/(6*300)
   end
 
   def connect(a,b)
