@@ -14,7 +14,6 @@ class LoopedMazeSolver
     @pos = Point(0,0)
     @vec = Vector(1,0)
     @explored_nodes = Set.new
-    @explored_nodes << pos
     @maze = GriddedMaze.new
 
     # assume we start facing a segment
@@ -23,6 +22,10 @@ class LoopedMazeSolver
 
   def unexplored_nodes
     maze.nodes - explored_nodes
+  end
+
+  def unexplored_other_nodes
+    unexplored_nodes.reject { |node| pos == node }
   end
 
   def estimate_grid_units(distance)
@@ -84,12 +87,17 @@ class LoopedMazeSolver
   end
 
   def explore_to_end
+    puts "\n\nSTARTING NEW EXPLORATION FROM #{pos}\n"
+
     while pos != maze.end
       distances_from_pos = maze.solve(pos)
 
-      closest_unexplored_node = unexplored_nodes.min_by { |node|
+      closest_unexplored_node = unexplored_other_nodes.min_by { |node|
         distances_from_pos[node]
       }
+
+      # TODO: handle this better
+      break if closest_unexplored_node.nil?
 
       explore_to closest_unexplored_node
     end
