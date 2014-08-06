@@ -53,6 +53,11 @@ END
       expect(maze.get_path Point(0,0), Point(1,2)).to eq [[0,0],[0,1],[0,2],[1,2]].map { |x| Point.new x }
     end
 
+    it "can solve a trivial path" do
+      turning_path = maze.get_turning_path Vector(-1,0), Point(0,0), Point(0,0)
+      expect(turning_path).to eq []
+    end
+
     specify do
       turning_path = maze.get_turning_path Vector(-1,0), Point(1,0), Point(2,1)
       expect(turning_path).to eq [:straight, :right, :right]

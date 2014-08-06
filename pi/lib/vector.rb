@@ -68,6 +68,8 @@ class Vector
     "<#{x},#{y}>"
   end
 
+  alias_method :to_s, :inspect
+
   def turn(dir)
     Vector complex*case dir
                    when :left
@@ -96,6 +98,9 @@ class Vector
     [:straight, :left, :back, :right][left_amount]
   end
 
+  def length
+    complex.abs
+  end
 end
 
 def Vector(*args)

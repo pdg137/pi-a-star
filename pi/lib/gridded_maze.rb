@@ -33,6 +33,9 @@ class GriddedMaze < Maze
 
     path = get_path(start, finish)
 
+    # return empty list if we are already there
+    return [] if path.length == 1
+
     last_node = path.shift
     current_node = path.shift
     last_dir = current_node - last_node

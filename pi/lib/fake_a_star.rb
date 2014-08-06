@@ -1,6 +1,9 @@
 require 'response_state'
 
 class FakeAStar
+  class OffLineException < Exception
+  end
+
   attr_reader :maze, :pos, :vec
 
   def initialize(map)
@@ -19,13 +22,23 @@ class FakeAStar
   end
 
   def follow
-    @pos += @vec
+    original_pos = @pos
+    exits = nil
+    while !exits || exits == [:straight, :back]
+      new_pos = @pos + @vec
 
-    # get exits sorted in leftmost order
-    exits = @maze.connections[@pos].map do |neighbor|
-      @vec.dir_to(neighbor - @pos)
-    end.sort_by do |dir|
-      [:left,:straight,:right,:back].index dir
+      if !@maze.connections[@pos].include? new_pos
+        raise OffLineException.new
+      end
+
+      @pos = new_pos
+
+      # get exits sorted in leftmost order
+      exits = @maze.connections[@pos].map do |neighbor|
+        @vec.dir_to(neighbor - @pos)
+      end.sort_by do |dir|
+        [:left,:straight,:right,:back].index dir
+      end
     end
 
     status = if maze.end == @pos
@@ -34,9 +47,11 @@ class FakeAStar
                :intersection
              end
 
+    distance = (@pos - original_pos).length * 280 * 6 + (rand(60) - 30)
+
     response = ResponseState::Response.new(status,
                                            "",
-                                           {exits: exits}
+                                           {exits: exits, distance: distance}
                                            )
     yield response
   end
