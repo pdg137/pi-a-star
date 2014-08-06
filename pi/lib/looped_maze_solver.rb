@@ -41,7 +41,7 @@ class LoopedMazeSolver
     puts "connect #{a}-#{b}"
   end
 
-  def record_intersection(context)
+  def record_path(context)
     units = estimate_grid_units context[:distance]
     puts "distance #{context[:distance]} -> #{units} units"
     # TODO: handle zero!
@@ -58,7 +58,9 @@ class LoopedMazeSolver
 
       explored_nodes << pos
     end
+  end
 
+  def record_intersection(context)
     puts "exits: #{context[:exits]}"
     context[:exits].each do |dir|
       next if dir == :back # this is already covered
@@ -83,10 +85,11 @@ class LoopedMazeSolver
 
       a_star.follow do |result|
         result.end {
-          record_intersection(result.context)
+          record_path(result.context)
           maze.end = pos
         }
         result.intersection {
+          record_path(result.context)
           record_intersection(result.context)
         }
         result.button { raise }

@@ -41,6 +41,12 @@ class FakeAStar
       end
     end
 
+    # the robot seems to detect exits on an end spot
+    # this will force us to ignore them
+    if maze.end == @pos
+      exits = [:left,:straight,:right,:back]
+    end
+
     status = if maze.end == @pos
                :end
              else

@@ -109,4 +109,30 @@ END
       expect(maze.end).to eq Point(3,0)
     end
   end
+
+
+  context "much more complicated maze" do
+    let(:maze) {
+      GriddedMaze.from_s <<END
+# # #-#-#-#-#
+| | |       |
+# # # #-# # #
+| | | |   | |
+# #-# # X-@ #
+| | | |   | |
+# # #-#-#-# #
+| | | |     |
+#-# # #     #
+|   | |     |
+#-#-#-#   ?-#
+  | | |     |
+#-# # #-#-#-#
+END
+    }
+
+    it "finds the shortest path from @ to ?" do
+      turning_path = maze.get_turning_path Vector(0,-1), Point(5,4), Point(5,1)
+      expect(turning_path).to eq [:straight, :right, :left, :straight, :left, :left, :left]
+    end
+  end
 end
