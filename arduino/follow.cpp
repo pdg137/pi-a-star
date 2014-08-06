@@ -13,6 +13,8 @@ uint8_t follow_line;
 int16_t last_pos;
 uint8_t off_line;
 int32_t off_line_distance;
+uint8_t on_line;
+int32_t on_line_distance;
 uint8_t detect_left_count;
 uint8_t detect_right_count;
 uint8_t detected_intersection;
@@ -38,6 +40,8 @@ void Follow::readSensors()
   if(max(max(Follow::sensors[1],Follow::sensors[2]),Follow::sensors[3]) < 20)
   {
     // off line
+    on_line = 0;
+    
     if(Encoders::distance > 1000)
     {
       // probably at end
@@ -61,6 +65,12 @@ void Follow::readSensors()
   {
     off_line = 0;
     Follow::pos = (-(int32_t)sensors[1]+sensors[3])*1000/(sensors[1]+sensors[2]+sensors[3]);
+    
+    if(!on_line)
+    {
+      on_line = 1;
+      on_line_distance = Encoders::distance;
+    }
   }
 }
 
@@ -192,7 +202,7 @@ void Follow::follow()
   if(off_line && Encoders::distance - off_line_distance > 600 ||
     detected_intersection && Encoders::distance - detected_intersection_distance > 600)
   {
-    detected_straight = !off_line;
+    detected_straight = on_line && Encoders::distance - on_line_distance > 100;
     state = STATE_WAITING;
   }
   
