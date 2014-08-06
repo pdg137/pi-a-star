@@ -162,7 +162,6 @@ void Follow::checkForEnd()
   if(on_dark && Encoders::distance - on_dark_distance > 400)
   {
     detected_end = 1;
-    state = STATE_WAITING;
   }
 }
 
