@@ -1,3 +1,9 @@
+require_relative 'maze'
+require_relative 'point'
+require_relative 'vector'
+require_relative 'gridded_maze'
+require 'set'
+
 class LoopedMazeSolver
   # Our internal concept of the maze.
   # Updated as we explore it.

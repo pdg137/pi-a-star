@@ -3,8 +3,8 @@
 system("echo #{Process.pid} > /var/run/robot.pid")
 $stdout.sync = $stderr.sync = true
 
-require_relative 'a_star'
-require_relative 'maze_solver'
+require_relative 'lib/a_star'
+require_relative 'lib/looped_maze_solver'
 
 a_star = AStar.new
 
@@ -24,6 +24,6 @@ while true
   end
 
   if report.button1?
-    MazeSolver.new(a_star).run
+    LoopedMazeSolver.new(a_star).explore_to_end
   end
 end
