@@ -159,7 +159,7 @@ class LoopedMazeSolver
           record_path(result.context)
           record_intersection(result.context)
         }
-        result.button { raise }
+        result.button { raise "button pressed" }
       end
 
     end

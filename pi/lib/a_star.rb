@@ -11,12 +11,23 @@ class AStar
     @command_count = 0
   end
 
-  def send_command(command)
-    @command_count += 1
+  def send_command_data(command)
     @i2c.write(20, [0,@command_count,command].pack("CCC"))
+  end
+
+  def send_command(command)
+    # For some reason, when we send 128, it gets mapped to zero
+    # and causes an infinite loop.
+    @command_count = (@command_count + 1) % 16
+    send_command_data command
+    start = Time.now
 
     while get_report.command_count != command_count
       sleep(0.01)
+      if 1000*(Time.now - start) > 20
+        send_command_data command
+        start = Time.now
+      end
     end
   end
 
