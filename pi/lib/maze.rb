@@ -86,7 +86,16 @@ class Maze
     path = [from_node]
     while path.last != to_node
       neighbors = connections[path.last]
-      next_node = neighbors.min_by { |x| score[x] }
+      next_node = neighbors.min_by { |c|
+
+        add = 0
+        if block_given? && path.length >= 2
+          a = path[-2]
+          b = path[-1]
+          add = block.call(a,b,c)
+        end
+        score[c] + add
+      }
       return nil if next_node.nil?
       path << next_node
     end

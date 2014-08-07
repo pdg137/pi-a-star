@@ -16,7 +16,7 @@ describe LoopedMazeSolver do
 END
     end
 
-    xit "solves the maze" do
+    it "solves the maze" do
       fake_a_star.goto Point(0,0), Vector(1,0)
 
       subject.explore_to_end
@@ -30,7 +30,7 @@ END
       expect(fake_a_star.pos).to eq fake_a_star.maze.end
     end
 
-    xit "solves the maze starting from a dead end" do
+    it "solves the maze starting from a dead end" do
       fake_a_star.goto Point(1,0), Vector(-1,0)
 
       subject.explore_to_end
@@ -55,7 +55,7 @@ END
       fake_a_star.goto Point(1,0), Vector(0,1)
     end
 
-    xit "solves without exploring the central node (0,2)" do
+    it "solves without exploring the central node (0,2)" do
       subject.explore_to_end
       expect(fake_a_star.pos).to eq fake_a_star.maze.end
       subject.explore_entire_maze
@@ -78,7 +78,7 @@ END
       fake_a_star.goto Point(1,0), Vector(1,0)
     end
 
-    xit "solves the maze" do
+    it "solves the maze" do
       subject.explore_to_end
       expect(fake_a_star.pos).to eq fake_a_star.maze.end
     end
@@ -99,7 +99,7 @@ END
       fake_a_star.goto Point(0,0), Vector(1,0)
     end
 
-    xit "does not lose connections" do
+    it "does not lose connections" do
       subject.explore_entire_maze
       fake_a_star.goto Point(0,0), Vector(1,0)
       subject.replay_from_zero

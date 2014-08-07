@@ -127,6 +127,23 @@ END
     end
   end
 
+  context "another maze with straightaway options" do
+    let(:maze) {
+      GriddedMaze.from_s <<END
+  #-#
+  | |
+  # A-#-#
+  |     |
+@-#-#-#-#
+END
+    }
+
+    it "prefers the straightaway to A" do
+      turning_path = maze.get_turning_path Vector(1,0), Point(0,0), Point(2,1)
+      expect(turning_path).to eq %i(straight straight none none left left none)
+    end
+  end
+
   context "much more complicated maze" do
     let(:maze) {
       GriddedMaze.from_s <<END
