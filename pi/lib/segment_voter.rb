@@ -22,7 +22,6 @@ class SegmentVoter
 
   def vote_not_connected(a, b)
     self[a,b] -= 1
-    puts "subtract 1 from #{a},#{b} -> #{self[a,b]}"
   end
 
   def connected?(a, b)

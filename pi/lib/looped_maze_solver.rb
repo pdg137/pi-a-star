@@ -81,7 +81,6 @@ class LoopedMazeSolver
   def observe_no_segment(a,b)
     puts "no segment #{a}-#{b}"
     voter.vote_not_connected(a,b)
-    puts "-> #{voter.known?(a,b)}"
 
     if voter.not_connected?(a,b) && maze.nodes.include?(a) && maze.nodes.include?(b)
       disconnect(a,b)
