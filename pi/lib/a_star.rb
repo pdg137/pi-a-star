@@ -70,7 +70,7 @@ class AStar
     @i2c.write(20, [6,1,led].pack("CCC"))
   end
 
-  def follow(&block)
+  def follow(follow_min_distance, &block)
     return Follow.new(self).call(&block)
   end
 

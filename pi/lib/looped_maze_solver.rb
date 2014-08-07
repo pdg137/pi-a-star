@@ -3,6 +3,7 @@ require_relative 'point'
 require_relative 'vector'
 require_relative 'gridded_maze'
 require_relative 'segment_voter'
+require_relative 'turning_path_follower'
 require 'set'
 
 class LoopedMazeSolver
@@ -139,7 +140,10 @@ class LoopedMazeSolver
   def explore_to(target)
     puts "\nexplore to #{target}"
 
-    maze.get_turning_path(vec, pos, target).each do |turn|
+    turning_path_follower = TurningPathFollower.new(1800,300)
+    turning_path = maze.get_turning_path(vec, pos, target)
+
+    turning_path_follower.compute(turning_path) do |turn, follow_min_distance|
       next if turn == :none
 
       puts turn
@@ -152,7 +156,7 @@ class LoopedMazeSolver
 
       puts "follow"
 
-      a_star.follow do |result|
+      a_star.follow(follow_min_distance) do |result|
         result.end {
           record_path(result.context)
           maze.end = pos
