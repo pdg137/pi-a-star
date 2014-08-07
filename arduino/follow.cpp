@@ -27,6 +27,7 @@ int32_t on_dark_distance;
 int32_t turn_goal;
 int32_t state_start_millis;
 int32_t state_start_distance;
+int32_t follow_min_distance;
 
 uint8_t Follow::sensors[5];
 int16_t Follow::pos;
@@ -136,8 +137,9 @@ void Follow::turn()
   }
 }
 
-void Follow::doFollow()
+void Follow::doFollow(uint32_t follow_min_d)
 { 
+  follow_min_distance = follow_min_d;
   Encoders::reset();
   off_line = 0;
   detected_intersection = 0;
@@ -225,7 +227,8 @@ void Follow::follow_more()
 
 void Follow::follow()
 {
-  check_for_intersections();
+  if(Encoders::distance - state_start_distance > follow_min_distance)
+    check_for_intersections();
   
   if(off_line && Encoders::distance - off_line_distance > 300 ||
     detected_intersection && Encoders::distance - detected_intersection_distance > 300)
