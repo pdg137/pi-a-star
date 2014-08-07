@@ -4,11 +4,12 @@
 #include "encoders.h"
 #include "buttons.h"
 
-#define SPEED 200
+#define SLOW_SPEED 200
+#define SPEED 250
 #define MAX_SPEED 400
 #define MEDIUM_SPEED 300
 
-#define LEFT_RIGHT_DETECT_COUNT 5
+#define LEFT_RIGHT_DETECT_COUNT 3
 
 uint16_t calibration_min[5] = {40,680,500,680,40};
 uint16_t calibration_max[5] = {960, 920, 920, 920, 960};
@@ -126,14 +127,14 @@ void Follow::turn()
 {
   if(turn_goal > 0)
   {
-    Motors::set(100,-100);
+    Motors::set(MEDIUM_SPEED,-MEDIUM_SPEED);
   
     if(Encoders::turn >= turn_goal)
       state = STATE_SNAPPING;
   }
   else
   {
-    Motors::set(-100,100);
+    Motors::set(-MEDIUM_SPEED,MEDIUM_SPEED);
     
     if(Encoders::turn <= turn_goal)
       state = STATE_SNAPPING;
@@ -225,25 +226,27 @@ void Follow::follow_more()
     return;
   }
   
-  do_pid(detected_intersection ? SPEED/2 : SPEED);
+  do_pid(detected_intersection ? SLOW_SPEED : SPEED);
 }
 
 void Follow::follow()
 {
 
   if(Encoders::distance - state_start_distance > follow_min_distance)
+  {
     check_for_intersections();
   
-  if(off_line && Encoders::distance - off_line_distance > 300 ||
-    detected_intersection && Encoders::distance - detected_intersection_distance > 300)
-  {
-    detected_straight = on_line && Encoders::distance - on_line_distance > 100;
-    state = STATE_FOLLOWING_MORE;
+    if(off_line && Encoders::distance - off_line_distance > 300 ||
+      detected_intersection && Encoders::distance - detected_intersection_distance > 100)
+    {
+      detected_straight = on_line && Encoders::distance - on_line_distance > 100;
+      state = STATE_FOLLOWING_MORE;
+    }
   }
 
   uint16_t speed = SPEED;
   if(detected_intersection)
-    speed = SPEED/2;
+    speed = SLOW_SPEED;
   else if(follow_min_distance - (Encoders::distance - state_start_distance) > 1500)
     speed = MAX_SPEED;
   else if(follow_min_distance - (Encoders::distance - state_start_distance) > 500)
