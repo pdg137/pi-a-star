@@ -110,6 +110,22 @@ END
     end
   end
 
+  context "maze with straightaways and zigzag options" do
+    let(:maze) {
+      GriddedMaze.from_s <<END
+#-#-#-#
+|   |
+# #-#
+| |
+#-#-@
+END
+    }
+
+    it "prefers straightaways" do
+      turning_path = maze.get_turning_path Vector(-1,0), Point(2,0), Point(3,2)
+      expect(turning_path).to eq [:straight, :straight, :right, :none, :right, :none, :straight]
+    end
+  end
 
   context "much more complicated maze" do
     let(:maze) {

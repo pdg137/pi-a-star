@@ -28,10 +28,19 @@ class GriddedMaze < Maze
     end
   end
 
+  def path_weighting(a,b,c)
+    if(a.x+c.x == 2*b.x &&
+       a.y+c.y == 2*b.y)
+      1
+    else
+      4
+    end
+  end
+
   def get_turning_path(vector, start, finish)
     vector.assert_cardinal
 
-    path = get_path(start, finish)
+    path = get_path(start, finish) { |a,b,c| path_weighting(a,b,c) }
 
     # return empty list if we are already there
     return [] if path.length == 1
