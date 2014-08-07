@@ -4,6 +4,9 @@
 #include "encoders.h"
 #include "buttons.h"
 
+#define SPEED 200
+#define LEFT_RIGHT_DETECT_COUNT 5
+
 uint16_t calibration_min[5] = {40,680,500,680,40};
 uint16_t calibration_max[5] = {960, 920, 920, 920, 960};
 
@@ -23,6 +26,8 @@ uint8_t on_dark;
 int32_t on_dark_distance;
 int32_t turn_goal;
 int32_t state_start_millis;
+int32_t state_start_distance;
+int32_t follow_min_distance;
 
 uint8_t Follow::sensors[5];
 int16_t Follow::pos;
@@ -83,6 +88,7 @@ void Follow::update()
   if(state != last_state)
   {
     state_start_millis = millis();
+    state_start_distance = Encoders::distance;
     last_state = state;
   }
   
@@ -109,7 +115,7 @@ void Follow::update()
 void Follow::doTurn(int16_t angle_degrees)
 {
   Encoders::reset();
-  turn_goal = angle_degrees*12;
+  turn_goal = angle_degrees*11;
   state = STATE_TURNING;
 }
 
@@ -131,8 +137,9 @@ void Follow::turn()
   }
 }
 
-void Follow::doFollow()
+void Follow::doFollow(uint32_t follow_min_d)
 { 
+  follow_min_distance = follow_min_d;
   Encoders::reset();
   off_line = 0;
   detected_intersection = 0;
@@ -153,7 +160,7 @@ void Follow::snap()
   Motors::set(limit(pid,-100,100), limit(-pid,-100,100));
   last_pos = pos;
   
-  if(millis() - state_start_millis > 200)
+  if(millis() - state_start_millis > 100)
     state = STATE_WAITING;
 }
 
@@ -178,30 +185,19 @@ void Follow::checkForEnd()
   }
 }
 
-void Follow::follow_more()
-{
-  if(off_line || millis() - state_start_millis > 100)
-  {
-    state = STATE_WAITING;
-    return;
-  }
-  
-  Motors::set(100,100);
-}
-
-void Follow::follow()
-{  
+void Follow::check_for_intersections()
+{    
   if(sensors[0] > 128)
     detect_left_count += 1;
   else
     detect_left_count = 0;
-  if(detect_left_count > 10) // maybe add min distance
+  if(detect_left_count > LEFT_RIGHT_DETECT_COUNT) // maybe add min distance
     detected_left = 1;
   if(sensors[4] > 128)
     detect_right_count += 1;
   else
     detect_right_count = 0;
-  if(detect_right_count > 10)
+  if(detect_right_count > LEFT_RIGHT_DETECT_COUNT)
     detected_right = 1;
   
   if((detected_left || detected_right) &&
@@ -212,16 +208,43 @@ void Follow::follow()
   }
   
   checkForEnd();
+}
+
+void Follow::follow_more()
+{
+  check_for_intersections();
   
-  if(off_line && Encoders::distance - off_line_distance > 600 ||
-    detected_intersection && Encoders::distance - detected_intersection_distance > 600)
+  detected_straight = on_line && Encoders::distance - on_line_distance > 100;
+    
+  if(Encoders::distance - state_start_distance > 300)
+  {
+    state = STATE_WAITING;
+    return;
+  }
+  
+  do_pid(detected_intersection ? SPEED/2 : SPEED);
+}
+
+void Follow::follow()
+{
+  if(Encoders::distance - state_start_distance > follow_min_distance)
+    check_for_intersections();
+  
+  if(off_line && Encoders::distance - off_line_distance > 300 ||
+    detected_intersection && Encoders::distance - detected_intersection_distance > 300)
   {
     detected_straight = on_line && Encoders::distance - on_line_distance > 100;
     state = STATE_FOLLOWING_MORE;
   }
   
+  do_pid(detected_intersection ? SPEED/2 : SPEED);
+}
+
+void Follow::do_pid(uint8_t speed)
+{
   int32_t diff = last_pos - pos;
   int32_t pid = pos/4 - diff;
-  Motors::set(limit(100+pid,0,100), limit(100-pid,0,100));
+  
+  Motors::set(limit(speed+pid,0,speed), limit(speed-pid,0,speed));
   last_pos = pos;
 }

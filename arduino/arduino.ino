@@ -15,6 +15,7 @@ struct
 {
   uint8_t command_count;
   uint8_t command;
+  uint32_t follow_min_distance;
   uint8_t led_state_modified;
   uint8_t led_state;
 } data;
@@ -71,7 +72,7 @@ void check_command()
     Follow::doTurn(-180);
     break;
   case COMMAND_FOLLOW:
-    Follow::doFollow();
+    Follow::doFollow(data.follow_min_distance);
     break;
   }
 }
