@@ -1,5 +1,6 @@
 require_relative 'point'
 require_relative 'vector'
+require_relative 'maze'
 
 class GriddedMaze < Maze
   attr_accessor :end
