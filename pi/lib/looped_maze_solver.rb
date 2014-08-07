@@ -140,6 +140,8 @@ class LoopedMazeSolver
     puts "\nexplore to #{target}"
 
     maze.get_turning_path(vec, pos, target).each do |turn|
+      next if turn == :none
+
       puts turn
       a_star.turn(turn) do |result|
         result.done {

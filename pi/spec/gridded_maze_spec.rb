@@ -60,7 +60,7 @@ END
 
     specify do
       turning_path = maze.get_turning_path Vector(-1,0), Point(1,0), Point(2,1)
-      expect(turning_path).to eq [:straight, :right, :right]
+      expect(turning_path).to eq [:straight, :right, :right, :none]
     end
 
     specify do
@@ -102,7 +102,7 @@ END
 
     specify do
       turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(5,2)
-      expect(turning_path).to eq [:straight, :straight, :right, :straight, :right, :left, :right, :left, :left]
+      expect(turning_path).to eq [:straight, :straight, :right, :none, :straight, :right, :left, :right, :left, :left, :none]
     end
 
     it "identifies the end" do
@@ -132,7 +132,7 @@ END
 
     it "finds the shortest path from @ to ?" do
       turning_path = maze.get_turning_path Vector(0,-1), Point(5,4), Point(5,1)
-      expect(turning_path).to eq [:straight, :right, :left, :straight, :left, :left, :left]
+      expect(turning_path).to eq [:straight, :right, :none, :left, :none, :straight, :left, :none, :none, :left, :left]
     end
   end
 end

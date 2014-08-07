@@ -49,7 +49,9 @@ class GriddedMaze < Maze
 
       # skip straights on nodes with no other neighbors since the
       # robot will drive right through them without seeing a node
-      if !(connections[current_node].length == 2 && last_dir == next_dir)
+      if connections[current_node].length == 2 && last_dir == next_dir
+        turns << :none
+      else
         turns << last_dir.dir_to(next_dir)
       end
 
