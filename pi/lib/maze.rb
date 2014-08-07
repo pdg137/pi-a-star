@@ -40,13 +40,13 @@ class Maze
     remove_connections node1 => [node2], node2 => [node1]
   end
 
-  def solve(goal)
+  def solve(goal, &scoring_function)
     score = initial_score(goal)
     unchecked_nodes = nodes.dup # because we are using delete
 
     until unchecked_nodes.empty?
       node = closest(unchecked_nodes, score)
-      check(score, node)
+      check(score, node, &scoring_function)
       unchecked_nodes.delete node
     end
 
@@ -66,12 +66,18 @@ class Maze
 
   def check(score, node)
     connections[node].each do |neighbor|
-      score[neighbor] = score[node]+1 if score[neighbor] > score[node]
+      add = 1
+
+      if block_given?
+        add = yield neighbor, node, connections[node].min_by { |n2| score[n2] }
+      end
+
+      score[neighbor] = score[node]+add if score[neighbor] > score[node]+add
     end
   end
 
-  def get_path(from_node, to_node)
-    score = solve(to_node)
+  def get_path(from_node, to_node, &block)
+    score = solve(to_node, &block)
 
     raise "node #{from_node.inspect} not present" if !nodes.include? from_node
     raise "node #{to_node.inspect} not present" if !nodes.include? to_node

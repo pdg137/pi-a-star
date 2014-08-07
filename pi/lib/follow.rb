@@ -1,12 +1,13 @@
 require 'response_state'
 
 class Follow < ResponseState::Service
-  def initialize(a_star)
+  def initialize(a_star, follow_min_distance)
     @a_star = a_star
+    @follow_min_distance = follow_min_distance
   end
 
   def call(&block)
-    @a_star.send_follow_command
+    @a_star.send_follow_command(@follow_min_distance)
 
     until @a_star.get_report.follow_state == 0 ||
         @a_star.get_report.follow_state == 4

@@ -21,10 +21,11 @@ class FakeAStar
     yield response
   end
 
-  def follow
+  def follow(follow_min_distance)
     original_pos = @pos
     exits = nil
-    while !exits || exits == [:straight, :back]
+    distance = 0
+    while (!exits || exits == [:straight, :back]) || distance < follow_min_distance
       new_pos = @pos + @vec
 
       if !@maze.connections[@pos].include? new_pos
@@ -32,6 +33,7 @@ class FakeAStar
       end
 
       @pos = new_pos
+      distance = (@pos - original_pos).length * 300 * 6 + (rand(60) - 30)
 
       # get exits sorted in leftmost order
       exits = @maze.connections[@pos].map do |neighbor|
@@ -53,7 +55,6 @@ class FakeAStar
                :intersection
              end
 
-    distance = (@pos - original_pos).length * 300 * 6 + (rand(60) - 30)
 
     response = ResponseState::Response.new(status,
                                            "",

@@ -46,14 +46,16 @@ END
 #-# #
     |
 X-#-#
+  |
+  #
 END
     end
 
     before do
-      fake_a_star.goto Point(1,0), Vector(1,0)
+      fake_a_star.goto Point(1,0), Vector(0,1)
     end
 
-    it "solves without exploring the central node (0,1)" do
+    it "solves without exploring the central node (0,2)" do
       subject.explore_to_end
       expect(fake_a_star.pos).to eq fake_a_star.maze.end
       subject.explore_entire_maze
@@ -79,6 +81,31 @@ END
     it "solves the maze" do
       subject.explore_to_end
       expect(fake_a_star.pos).to eq fake_a_star.maze.end
+    end
+  end
+
+  context "maze with straightaways" do
+    let(:fake_a_star) do
+      FakeAStar.new <<END
+#-#-#-#-X
+| | | |
+#-#-#-#
+| | | |
+#-#-#-#
+END
+    end
+
+    before do
+      fake_a_star.goto Point(0,0), Vector(1,0)
+    end
+
+    it "does not lose connections" do
+      subject.explore_entire_maze
+      fake_a_star.goto Point(0,0), Vector(1,0)
+      subject.replay_from_zero
+      fake_a_star.goto Point(0,0), Vector(1,0)
+      subject.replay_from_zero
+      expect(subject.maze.connections[Point(1,1)]).to eq Point(1,1).cartesian_neighbors.to_set
     end
   end
 end

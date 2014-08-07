@@ -3,6 +3,7 @@ require_relative 'point'
 require_relative 'vector'
 require_relative 'gridded_maze'
 require_relative 'segment_voter'
+require_relative 'turning_path_follower'
 require 'set'
 
 class LoopedMazeSolver
@@ -78,9 +79,7 @@ class LoopedMazeSolver
   end
 
   def observe_no_segment(a,b)
-    puts "no segment #{a}-#{b}"
     voter.vote_not_connected(a,b)
-    puts "-> #{voter.known?(a,b)}"
 
     if voter.not_connected?(a,b) && maze.nodes.include?(a) && maze.nodes.include?(b)
       disconnect(a,b)
@@ -90,7 +89,7 @@ class LoopedMazeSolver
     check_deductions(b)
   end
 
-  def record_path(context)
+  def record_path(follow_min_distance, context)
     units = estimate_grid_units context[:distance]
     puts "distance #{context[:distance]} -> #{units} units"
     # TODO: handle zero!
@@ -109,18 +108,20 @@ class LoopedMazeSolver
       explored_nodes << pos
     end
 
-    pos1 = original_pos
-    left = vec.turn(:left)
-    right = vec.turn(:left)
-    (units-1).times.each do
-      pos2 = pos1 + vec
+    if follow_min_distance < 600
+      pos1 = original_pos
+      left = vec.turn(:left)
+      right = vec.turn(:left)
+      (units-1).times.each do
+        pos2 = pos1 + vec
 
-      left_node = pos2 + left
-      right_node = pos2 + right
-      observe_no_segment(pos2, left_node)
-      observe_no_segment(pos2, right_node)
+        left_node = pos2 + left
+        right_node = pos2 + right
+        observe_no_segment(pos2, left_node)
+        observe_no_segment(pos2, right_node)
 
-      pos1 = pos2
+        pos1 = pos2
+      end
     end
   end
 
@@ -139,7 +140,12 @@ class LoopedMazeSolver
   def explore_to(target)
     puts "\nexplore to #{target}"
 
-    maze.get_turning_path(vec, pos, target).each do |turn|
+    turning_path_follower = TurningPathFollower.new(1800,300)
+    turning_path = maze.get_turning_path(vec, pos, target)
+
+    turning_path_follower.compute(turning_path) do |turn, follow_min_distance|
+      next if turn == :none
+
       puts turn
       a_star.turn(turn) do |result|
         result.done {
@@ -148,15 +154,15 @@ class LoopedMazeSolver
         result.button { raise }
       end
 
-      puts "follow"
+      puts "follow min=#{follow_min_distance}"
 
-      a_star.follow do |result|
+      a_star.follow(follow_min_distance) do |result|
         result.end {
-          record_path(result.context)
+          record_path(follow_min_distance, result.context)
           maze.end = pos
         }
         result.intersection {
-          record_path(result.context)
+          record_path(follow_min_distance, result.context)
           record_intersection(result.context)
         }
         result.button { raise "button pressed" }

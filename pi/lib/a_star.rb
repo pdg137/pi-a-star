@@ -11,40 +11,40 @@ class AStar
     @command_count = 0
   end
 
-  def send_command_data(command)
-    @i2c.write(20, [0,@command_count,command].pack("CCC"))
+  def send_command_data(command, follow_min_distance)
+    @i2c.write(20, [0,@command_count,command, follow_min_distance].pack("CCCL"))
   end
 
-  def send_command(command)
+  def send_command(command, follow_min_distance)
     # For some reason, when we send 128, it gets mapped to zero
     # and causes an infinite loop.
     @command_count = (@command_count + 1) % 16
-    send_command_data command
+    send_command_data command, follow_min_distance
     start = Time.now
 
     while get_report.command_count != command_count
       sleep(0.01)
       if 1000*(Time.now - start) > 20
-        send_command_data command
+        send_command_data command, follow_min_distance
         start = Time.now
       end
     end
   end
 
   def turn_left
-    send_command(1)
+    send_command(1,0)
   end
 
   def turn_right
-    send_command(2)
+    send_command(2,0)
   end
 
   def turn_back
-    send_command(3)
+    send_command(3,0)
   end
 
-  def send_follow_command
-    send_command(4)
+  def send_follow_command(follow_min_distance)
+    send_command(4,follow_min_distance)
   end
 
   def get_raw_report
@@ -67,11 +67,11 @@ class AStar
     led = (red ? 1 : 0) +
       (yellow ? 2 : 0 ) +
       (green ? 4 : 0)
-    @i2c.write(20, [2,1,led].pack("CCC"))
+    @i2c.write(20, [6,1,led].pack("CCC"))
   end
 
-  def follow(&block)
-    return Follow.new(self).call(&block)
+  def follow(follow_min_distance, &block)
+    return Follow.new(self, follow_min_distance).call(&block)
   end
 
   def turn(dir, &block)

@@ -31,12 +31,37 @@ describe Maze do
   end
 
   describe "#solve" do
+    context "two-node maze" do
+      let(:nodes) { [:a,:b] }
+      let(:connections) {
+        {
+          :a => [:b].to_set,
+          :b => [:a].to_set
+        }
+      }
+      it "calls the block" do
+        calls = []
+        maze.solve(:a) { |*args| calls << args; 1 }
+        expect(calls).to eq [[:b, :a, :b], [:a, :b, :a]]
+      end
+    end
+
     it "solves to node 4" do
       expect(maze.solve(4)).to eq({1=>2,2=>1,3=>1,4=>0})
     end
 
     it "solves to node 1" do
       expect(maze.solve(1)).to eq({1=>0,2=>1,3=>2,4=>2})
+    end
+
+    it "solves differently if we avoid the 2-4 path" do
+      expect(maze.solve(4) { |*args|
+               if args == [2,4,2] || args == [2,4,3]
+                 10
+               else
+                 1
+               end
+             }).to eq({1=>3,2=>2,3=>1,4=>0})
     end
   end
 
@@ -68,7 +93,7 @@ describe Maze do
   end
 
   describe "#check" do
-    specify "given 1, it sets the score on node 2" do
+    it "given 1, it sets the score on node 2" do
       score = {1=>1}
       score.default = INF
 
@@ -76,7 +101,7 @@ describe Maze do
       expect(score).to eq({1=>1, 2=>2})
     end
 
-    specify "it adds 1 to the score" do
+    it "adds 1 to the score" do
       score = {1=>5}
       score.default = INF
 
@@ -84,7 +109,7 @@ describe Maze do
       expect(score).to eq({1=>5, 2=>6})
     end
 
-    specify "does not overwrite lower scores" do
+    it "does not overwrite lower scores" do
       score = {1=>5,2=>5}
       score.default = INF
 
@@ -92,12 +117,25 @@ describe Maze do
       expect(score).to eq({1=>5,2=>5})
     end
 
-    specify "spreads to all connected nodes" do
+    it "spreads to all connected nodes" do
       score = {2=>0}
       score.default = INF
 
       maze.check(score,2)
       expect(score).to eq({1=>1,2=>0,3=>1,4=>1})
+    end
+
+    it "uses the block" do
+      score = {2=>0}
+      score.default = INF
+      maze.check(score, 2) { |*args|
+        case
+        when args[0] == 1 then 5
+        when args[0] == 3 then 6
+        when args[0] == 4 then 7
+        end
+      }
+      expect(score).to eq({1=>5,2=>0,3=>6,4=>7})
     end
   end
 
