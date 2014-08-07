@@ -8,7 +8,8 @@ class Follow < ResponseState::Service
   def call(&block)
     @a_star.send_follow_command
 
-    until @a_star.get_report.follow_state == 0
+    until @a_star.get_report.follow_state == 0 ||
+        @a_star.get_report.follow_state == 4
       sleep(0.01)
     end
 
