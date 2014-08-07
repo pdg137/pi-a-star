@@ -5,6 +5,9 @@
 #include "buttons.h"
 
 #define SPEED 200
+#define MAX_SPEED 400
+#define MEDIUM_SPEED 300
+
 #define LEFT_RIGHT_DETECT_COUNT 5
 
 uint16_t calibration_min[5] = {40,680,500,680,40};
@@ -227,6 +230,7 @@ void Follow::follow_more()
 
 void Follow::follow()
 {
+
   if(Encoders::distance - state_start_distance > follow_min_distance)
     check_for_intersections();
   
@@ -236,11 +240,19 @@ void Follow::follow()
     detected_straight = on_line && Encoders::distance - on_line_distance > 100;
     state = STATE_FOLLOWING_MORE;
   }
-  
-  do_pid(detected_intersection ? SPEED/2 : SPEED);
+
+  uint16_t speed = SPEED;
+  if(detected_intersection)
+    speed = SPEED/2;
+  else if(follow_min_distance - (Encoders::distance - state_start_distance) > 1500)
+    speed = MAX_SPEED;
+  else if(follow_min_distance - (Encoders::distance - state_start_distance) > 500)
+    speed = MEDIUM_SPEED;
+
+  do_pid(speed);
 }
 
-void Follow::do_pid(uint8_t speed)
+void Follow::do_pid(uint16_t speed)
 {
   int32_t diff = last_pos - pos;
   int32_t pid = pos/4 - diff;
