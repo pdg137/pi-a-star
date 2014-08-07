@@ -25,4 +25,6 @@ class Follow
   static void turn();
   static void wait();
   static void snap();
+  static void do_pid(uint8_t speed);
+  static void check_for_intersections();
 };
