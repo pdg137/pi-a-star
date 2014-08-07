@@ -25,4 +25,20 @@ describe TurningPathFollower do
     }.to yield_successive_args( [:left, unit*2+limit],
                                 [:right, limit] )
   end
+
+  it "does no more than 6 in a group if possible" do
+    expect { |b|
+      yield_arrays(subject, [:left,:straight,:straight,:straight,:straight,:straight,:straight,:right], &b)
+    }.to yield_successive_args( [:left, unit*5+limit],
+                                [:straight, limit],
+                                [:right, limit])
+  end
+
+  it "makes the initial group smaller if necessary to not start with :none" do
+    expect { |b|
+      yield_arrays(subject, [:left,:straight,:straight,:straight,:none,:none,:none,:right], &b)
+    }.to yield_successive_args( [:left, unit*2+limit],
+                                [:straight, unit*3+limit],
+                                [:right, limit])
+  end
 end

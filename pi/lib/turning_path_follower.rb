@@ -9,7 +9,19 @@ class TurningPathFollower
       [:left,:right,:back].include? turn
     }.
       each do |turn_group|
-      yield turn_group[0], @unit*(turn_group.length-1) + @limit
+
+      until turn_group.nil?
+        current = turn_group[0..5]
+        turn_group = turn_group[6..-1]
+
+        # e.g. [:straight, :straight] [:none, :none]
+        # -> [:straight], [:straight, :none, :none]
+        while turn_group != nil && turn_group[0] == :none
+          turn_group.unshift current.pop
+        end
+
+        yield current[0], @unit*(current.length-1) + @limit
+      end
     end
   end
 end
