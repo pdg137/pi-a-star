@@ -20,6 +20,8 @@ class TurningPathFollower
           turn_group.unshift current.pop
         end
 
+        turn_group = nil if turn_group == []
+
         yield current[0], @unit*(current.length-1) + @limit
       end
     end

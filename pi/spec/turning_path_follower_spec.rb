@@ -41,4 +41,29 @@ describe TurningPathFollower do
                                 [:straight, unit*3+limit],
                                 [:right, limit])
   end
+
+  context "path with a 6x straight segment including some :none" do
+    let(:path) { [:right, :none, :straight, :none, :straight, :none, :right] }
+
+    it "does not attempt to split up the straightaway" do
+      expect { |b|
+        yield_arrays(subject, path, &b)
+      }.to yield_successive_args( [:right, unit*5+limit],
+                                  [:right, limit]
+                                  )
+    end
+  end
+
+  context "path with a 7x straight segment including some :none" do
+    let(:path) { [:right, :none, :straight, :none, :straight, :none, :none, :right] }
+
+    it "does not attempt to split up the straightaway" do
+      expect { |b|
+        yield_arrays(subject, path, &b)
+      }.to yield_successive_args( [:right, unit*3+limit],
+                                  [:straight, unit*2+limit],
+                                  [:right, limit]
+                                  )
+    end
+  end
 end

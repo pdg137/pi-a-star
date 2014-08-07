@@ -103,8 +103,6 @@ class LoopedMazeSolver
 
       observe_segment(old_pos, pos)
 
-      puts maze.to_s(pos)
-
       explored_nodes << pos
     end
 
@@ -142,9 +140,11 @@ class LoopedMazeSolver
 
     turning_path_follower = TurningPathFollower.new(1800,300)
     turning_path = maze.get_turning_path(vec, pos, target)
+    puts "turning path #{turning_path.inspect}"
 
     turning_path_follower.compute(turning_path) do |turn, follow_min_distance|
       next if turn == :none
+      puts "next turn #{turn.inspect}"
 
       puts turn
       a_star.turn(turn) do |result|
@@ -169,6 +169,7 @@ class LoopedMazeSolver
         result.button { raise "button pressed" }
       end
 
+      puts maze.to_s(pos)
     end
   end
 

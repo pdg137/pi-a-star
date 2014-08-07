@@ -81,7 +81,7 @@ class Vector
                    when :back
                      -1
                    else
-                     raise "invalid dir #{dir}"
+                     raise "invalid dir #{dir.inspect}"
                    end
   end
 
