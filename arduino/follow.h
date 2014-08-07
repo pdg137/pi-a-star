@@ -13,6 +13,7 @@ class Follow
   static const uint8_t STATE_FOLLOWING = 1;
   static const uint8_t STATE_TURNING = 2;
   static const uint8_t STATE_SNAPPING = 3;
+  static const uint8_t STATE_FOLLOWING_MORE = 4;
   
   static uint8_t state;
   
@@ -20,6 +21,7 @@ class Follow
   static void readSensors();
   static void checkForEnd();
   static void follow();
+  static void follow_more();
   static void turn();
   static void wait();
   static void snap();

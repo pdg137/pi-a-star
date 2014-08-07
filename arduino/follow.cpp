@@ -91,6 +91,9 @@ void Follow::update()
   case STATE_FOLLOWING:
     follow();
     break;
+  case STATE_FOLLOWING_MORE:
+    follow_more();
+    break;
   case STATE_WAITING:
     wait();
     break;
@@ -175,6 +178,17 @@ void Follow::checkForEnd()
   }
 }
 
+void Follow::follow_more()
+{
+  if(off_line || millis() - state_start_millis > 100)
+  {
+    state = STATE_WAITING;
+    return;
+  }
+  
+  Motors::set(100,100);
+}
+
 void Follow::follow()
 {  
   if(sensors[0] > 128)
@@ -203,7 +217,7 @@ void Follow::follow()
     detected_intersection && Encoders::distance - detected_intersection_distance > 600)
   {
     detected_straight = on_line && Encoders::distance - on_line_distance > 100;
-    state = STATE_WAITING;
+    state = STATE_FOLLOWING_MORE;
   }
   
   int32_t diff = last_pos - pos;
