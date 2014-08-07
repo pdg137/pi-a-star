@@ -79,7 +79,6 @@ class LoopedMazeSolver
   end
 
   def observe_no_segment(a,b)
-    puts "no segment #{a}-#{b}"
     voter.vote_not_connected(a,b)
 
     if voter.not_connected?(a,b) && maze.nodes.include?(a) && maze.nodes.include?(b)
@@ -90,7 +89,7 @@ class LoopedMazeSolver
     check_deductions(b)
   end
 
-  def record_path(context)
+  def record_path(follow_min_distance, context)
     units = estimate_grid_units context[:distance]
     puts "distance #{context[:distance]} -> #{units} units"
     # TODO: handle zero!
@@ -109,18 +108,20 @@ class LoopedMazeSolver
       explored_nodes << pos
     end
 
-    pos1 = original_pos
-    left = vec.turn(:left)
-    right = vec.turn(:left)
-    (units-1).times.each do
-      pos2 = pos1 + vec
+    if follow_min_distance < 600
+      pos1 = original_pos
+      left = vec.turn(:left)
+      right = vec.turn(:left)
+      (units-1).times.each do
+        pos2 = pos1 + vec
 
-      left_node = pos2 + left
-      right_node = pos2 + right
-      observe_no_segment(pos2, left_node)
-      observe_no_segment(pos2, right_node)
+        left_node = pos2 + left
+        right_node = pos2 + right
+        observe_no_segment(pos2, left_node)
+        observe_no_segment(pos2, right_node)
 
-      pos1 = pos2
+        pos1 = pos2
+      end
     end
   end
 
@@ -157,11 +158,11 @@ class LoopedMazeSolver
 
       a_star.follow(follow_min_distance) do |result|
         result.end {
-          record_path(result.context)
+          record_path(follow_min_distance, result.context)
           maze.end = pos
         }
         result.intersection {
-          record_path(result.context)
+          record_path(follow_min_distance, result.context)
           record_intersection(result.context)
         }
         result.button { raise "button pressed" }
