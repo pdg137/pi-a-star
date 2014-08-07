@@ -16,7 +16,11 @@ def do_maze_solving(a_star)
   sleep(0.5)
 
   solver.explore_to_end
-  a_star.set_leds(true, true, true)
+  if solver.maze.end
+    a_star.set_leds(true, true, true)
+  else
+    a_star.set_leds(true, false, false)
+  end
   sleep(1)
   a_star.set_leds(false, false, false)
 
@@ -25,7 +29,13 @@ def do_maze_solving(a_star)
   while true
     report = a_star.get_report
 
-    break if report.button2?
+    if report.button2?
+      a_star.set_leds(true, false, false)
+      sleep(1)
+      if a_star.get_report.button2?
+        break
+      end
+    end
 
     if report.button1?
       a_star.set_leds(true, true, true)
@@ -35,6 +45,13 @@ def do_maze_solving(a_star)
       solver.replay_from_zero
     end
 
+    if solver.maze.end
+      a_star.set_leds(true, true, true)
+    else
+      a_star.set_leds(true, false, false)
+    end
+    sleep(0.1)
+    a_star.set_leds(false,false,false)
     sleep(0.1)
   end
 end
