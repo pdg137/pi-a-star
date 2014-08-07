@@ -154,7 +154,7 @@ class LoopedMazeSolver
         result.button { raise }
       end
 
-      puts "follow"
+      puts "follow min=#{follow_min_distance}"
 
       a_star.follow(follow_min_distance) do |result|
         result.end {

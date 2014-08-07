@@ -25,7 +25,7 @@ class AStar
     while get_report.command_count != command_count
       sleep(0.01)
       if 1000*(Time.now - start) > 20
-        send_command_data command
+        send_command_data command, follow_min_distance
         start = Time.now
       end
     end
@@ -43,8 +43,8 @@ class AStar
     send_command(3,0)
   end
 
-  def send_follow_command
-    send_command(4,600)
+  def send_follow_command(follow_min_distance)
+    send_command(4,follow_min_distance)
   end
 
   def get_raw_report
@@ -71,7 +71,7 @@ class AStar
   end
 
   def follow(follow_min_distance, &block)
-    return Follow.new(self).call(&block)
+    return Follow.new(self, follow_min_distance).call(&block)
   end
 
   def turn(dir, &block)
