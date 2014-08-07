@@ -32,8 +32,9 @@ class LoopedMazeSolver
   end
 
   def useful_nodes_to_explore
+    # exclude the current node, and any deduced nodes if the end is known
     unexplored_nodes.reject { |node|
-      pos == node || deduced_nodes.include?(node)
+      pos == node || (maze.end && deduced_nodes.include?(node))
     }
   end
 

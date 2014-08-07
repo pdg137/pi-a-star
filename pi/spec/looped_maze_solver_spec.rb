@@ -60,4 +60,25 @@ END
       expect(subject.explored_nodes).to_not include Point(0,1)
     end
   end
+
+  context "non-optimizable maze" do
+    let(:fake_a_star) do
+      FakeAStar.new <<END
+#-#-#
+|   |
+#-X #
+|   |
+# #-#
+END
+    end
+
+    before do
+      fake_a_star.goto Point(1,0), Vector(1,0)
+    end
+
+    it "solves the maze" do
+      subject.explore_to_end
+      expect(fake_a_star.pos).to eq fake_a_star.maze.end
+    end
+  end
 end
