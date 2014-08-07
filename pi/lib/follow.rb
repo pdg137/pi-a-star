@@ -7,10 +7,9 @@ class Follow < ResponseState::Service
 
   def call(&block)
     @a_star.send_follow_command
-    sleep(0.1) # let it start
 
     until @a_star.get_report.follow_state == 0
-      sleep(0.1)
+      sleep(0.01)
     end
 
     report = @a_star.get_report

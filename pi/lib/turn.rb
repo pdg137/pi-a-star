@@ -20,10 +20,8 @@ class Turn < ResponseState::Service
       raise "unknown dir: #{@dir}"
     end
 
-    sleep(0.1) # let it start
-
     until @a_star.get_report.follow_state == 0
-      sleep(0.1)
+      sleep(0.01)
     end
 
     state = :done

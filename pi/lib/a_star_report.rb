@@ -1,10 +1,12 @@
 class AStarReport
   attr_accessor :distance, :errors1, :errors2, :buttons, :sensors
   attr_accessor :pos, :left, :straight, :right, :end, :follow_state
+  attr_accessor :command_count
 
   def initialize()
     @sensors = [0,0,0,0,0]
     @distance = @errors1 = @errors2 = @buttons = @pos = @left = @straight = @right = @end = 0
+    @command_count = 0
   end
 
   # returns available exits in L S R B order
