@@ -23,7 +23,6 @@ class AStar
     start = Time.now
 
     while get_report.command_count != command_count
-      sleep(0.01)
       if 1000*(Time.now - start) > 20
         send_command_data command, follow_min_distance
         start = Time.now
