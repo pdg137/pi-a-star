@@ -14,7 +14,17 @@ class Maze
 
   def add_connections(params)
     params.each_pair do |node, neighbors|
-      connections[node] |= neighbors
+      # avoid problem with duplicates
+      if connections[node].empty?
+        connections[node] = [].to_set
+      end
+      connections[node].merge neighbors
+    end
+  end
+
+  def remove_connections(params)
+    params.each_pair do |node, neighbors|
+      connections[node].subtract neighbors
     end
   end
 
@@ -22,6 +32,12 @@ class Maze
     add_node node1
     add_node node2
     add_connections node1 => [node2], node2 => [node1]
+  end
+
+  def disconnect(node1, node2)
+    add_node node1
+    add_node node2
+    remove_connections node1 => [node2], node2 => [node1]
   end
 
   def solve(goal)

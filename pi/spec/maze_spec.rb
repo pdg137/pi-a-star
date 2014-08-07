@@ -4,10 +4,10 @@ describe Maze do
   let(:nodes) { [1,2,3,4] }
   let(:connections) {
     {
-      1 => [2],
-      2 => [1,3,4],
-      3 => [2,4],
-      4 => [2,3]
+      1 => [2].to_set,
+      2 => [1,3,4].to_set,
+      3 => [2,4].to_set,
+      4 => [2,3].to_set
     }
   }
   let(:maze) { Maze.new(nodes,connections) }
@@ -54,7 +54,7 @@ describe Maze do
   describe "#closest" do
     it "returns the only node in a trivial case" do
       score = {}
-      score.default = INF 
+      score.default = INF
 
       expect(maze.closest([1],score)).to eq 1
     end
@@ -104,7 +104,7 @@ describe Maze do
   describe "#add_connections" do
     it "does not add redundant connections" do
       maze.add_connections 1 => [2]
-      expect(maze.connections[1]).to eq [2]
+      expect(maze.connections[1]).to eq [2].to_set
     end
   end
 end

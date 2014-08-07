@@ -49,6 +49,10 @@ class Point
   def -(other)
     Vector(x - other.x, y - other.y)
   end
+
+  def cartesian_neighbors
+    [Point(x+1,y), Point(x,y+1), Point(x-1,y), Point(x,y-1)]
+  end
 end
 
 def Point(*args)
