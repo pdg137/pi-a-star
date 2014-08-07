@@ -13,14 +13,16 @@
 
 struct
 {
-  uint8_t command_modified;
+  uint8_t command_count;
   uint8_t command;
   uint8_t led_state_modified;
   uint8_t led_state;
 } data;
 
+
 struct
 {
+  uint8_t command_count;
   int32_t distance;
   uint32_t error1;
   uint32_t error2;
@@ -46,15 +48,16 @@ void setup()
 
 void check_command()
 {
-  uint8_t new_command = 0;
+  uint8_t new_command=COMMAND_NONE;
   
   cli();
-  if(data.command_modified)
+  if(data.command_count != report.command_count)
   {
     new_command = data.command;
-    data.command_modified = 0;
   }
   sei();
+  
+  report.command_count = data.command_count;
   
   switch(new_command)
   {
