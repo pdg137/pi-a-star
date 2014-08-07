@@ -4,12 +4,20 @@ require_relative 'follow'
 require_relative 'turn'
 
 class AStar
+  attr_reader :command_count
+
   def initialize
     @i2c = I2C.create('/dev/i2c-1')
+    @command_count = 0
   end
 
   def send_command(command)
-    @i2c.write(20, [0,1,command].pack("CCC"))
+    @command_count += 1
+    @i2c.write(20, [0,@command_count,command].pack("CCC"))
+
+    while get_report.command_count != command_count
+      sleep(0.01)
+    end
   end
 
   def turn_left
@@ -29,12 +37,13 @@ class AStar
   end
 
   def get_raw_report
-    return @i2c.read(20,25).unpack("lLLCCCCCCsccccc")
+    return @i2c.read(20,26).unpack("ClLLCCCCCCsccccc")
   end
 
   def get_report
     report = AStarReport.new
-    (report.distance, report.errors1, report.errors2, report.buttons,
+    (report.command_count,
+     report.distance, report.errors1, report.errors2, report.buttons,
      report.sensors[0], report.sensors[1], report.sensors[2],
      report.sensors[3], report.sensors[4],
      report.pos, report.follow_state,
