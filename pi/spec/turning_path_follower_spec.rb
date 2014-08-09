@@ -66,4 +66,28 @@ describe TurningPathFollower do
                                   )
     end
   end
+
+  context "path with a :back" do
+    let(:path) { [:back, :straight, :straight] }
+
+    it "does not attempt straightaways after a back - because they are less precise" do
+      expect { |b|
+        yield_arrays(subject, path, &b)
+      }.to yield_successive_args( [:back, limit],
+                                  [:straight, unit+limit]
+                                  )
+    end
+  end
+
+  context "path with a :back and :none" do
+    let(:path) { [:back, :none, :straight] }
+
+    it "includes the required straightaway" do
+      expect { |b|
+        yield_arrays(subject, path, &b)
+      }.to yield_successive_args( [:back, unit+limit],
+                                  [:straight, limit]
+                                  )
+    end
+  end
 end
