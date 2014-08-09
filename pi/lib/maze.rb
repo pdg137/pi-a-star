@@ -86,14 +86,20 @@ class Maze
     path = [from_node]
     while path.last != to_node
       neighbors = connections[path.last]
-      next_node = neighbors.min_by { |c|
+      next_node = (neighbors - [path[-2]]).min_by { |c|
 
         add = 0
-        if block_given? && path.length >= 2
+        if block_given?
+          # Add in two separate turns that are not accounted for
+          # by the score - a-b-c and b-c-d.
+          # Note that d is only an approximation to the true value.
           a = path[-2]
           b = path[-1]
-          add = block.call(a,b,c)
+          d = (connections[c] - [b]).min_by { |d| score[d] }
+          add += block.call(a,b,c) if a
+          add += block.call(b,c,d) if b && d
         end
+
         score[c] + add
       }
       return nil if next_node.nil?

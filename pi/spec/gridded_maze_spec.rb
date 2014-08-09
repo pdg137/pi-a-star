@@ -168,4 +168,21 @@ END
       expect(turning_path).to eq [:straight, :right, :none, :left, :none, :straight, :left, :none, :none, :left, :left]
     end
   end
+
+  context "contest maze" do
+    let(:maze) {
+      GriddedMaze.from_s <<END
+#-#-#
+|   |
+#-#-#
+|   |
+@   #
+END
+    }
+
+    it "finds a path not including :back" do
+      turning_path = maze.get_turning_path Vector(0,1), Point(0,0), Point(2,0)
+      expect(turning_path).to_not include :back
+    end
+  end
 end
