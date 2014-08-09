@@ -138,7 +138,7 @@ class LoopedMazeSolver
   def explore_to(target)
     puts "\nexplore to #{target.inspect}"
 
-    turning_path_follower = TurningPathFollower.new(1800,300)
+    turning_path_follower = TurningPathFollower.new(1800,600)
     turning_path = maze.get_turning_path(vec, pos, target)
     puts "turning path #{turning_path.inspect}"
 
