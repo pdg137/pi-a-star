@@ -136,7 +136,15 @@ class LoopedMazeSolver
   end
 
   def explore_to(target)
-    puts "\nexplore to #{target.inspect}"
+    while true
+      puts "Explore to #{target.inspect}"
+      break if try_explore_to(target)
+      puts "Try again!!"
+    end
+  end
+
+  def try_explore_to(target)
+    explored_nodes = []
 
     turning_path_follower = TurningPathFollower.new(1800,600)
     turning_path = maze.get_turning_path(vec, pos, target)
@@ -165,12 +173,17 @@ class LoopedMazeSolver
         result.intersection {
           record_path(follow_min_distance, result.context)
           record_intersection(result.context)
+          if estimate_grid_units(result.context[:distance]) < estimate_grid_units(follow_min_distance+300)
+            return false # error!
+          end
         }
         result.button { raise "button pressed" }
       end
 
       puts maze.to_s(pos)
     end
+
+    true
   end
 
   def explore_to_end

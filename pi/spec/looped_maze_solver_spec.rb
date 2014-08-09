@@ -153,6 +153,37 @@ END
       subject.explore_entire_maze
       fake_a_star.goto Point(5,1), Vector(1,0)
       subject.replay_from_zero
+      expect(fake_a_star.pos).to eq fake_a_star.maze.end
+    end
+  end
+
+  context "a heavily gridded maze" do
+    let(:fake_a_star) do
+      FakeAStar.new <<END
+X-#-#-#-#
+    |
+#-#-#-#-#
+| | | | |
+#-#-#-#-#
+| | | | |
+#-#-#-#-#
+| | | | |
+#-#-#-#-#
+    |
+    @
+END
+    end
+
+    before do
+      fake_a_star.goto Point(2,0), Vector(0,1)
+    end
+
+    it "finds the end" do
+      subject.explore_to_end
+      subject.explore_entire_maze
+      fake_a_star.goto Point(2,0), Vector(0,1)
+      subject.replay_from_zero
+      expect(fake_a_star.pos).to eq fake_a_star.maze.end
     end
   end
 end

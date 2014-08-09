@@ -25,6 +25,12 @@ class FakeAStar
     original_pos = @pos
     exits = nil
     distance = 0
+
+    # randomly screw up sometimes on straightaways over 4 to make sure we can recover
+    if rand < 0.2 && follow_min_distance > 7000
+      follow_min_distance -= 1800
+    end
+
     while (!exits || exits == [:straight, :back]) || distance < follow_min_distance
       new_pos = @pos + @vec
 
