@@ -1,4 +1,4 @@
-#include <Wire.h>
+#include "RPiI2C.h"
 #include "i2c_interface.h"
 #include "motors.h"
 #include "encoders.h"
