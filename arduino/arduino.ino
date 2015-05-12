@@ -1,9 +1,5 @@
 #include "RPiI2C.h"
 #include "i2c_interface.h"
-#include "motors.h"
-#include "encoders.h"
-#include "follow.h"
-#include "buttons.h"
 
 #define COMMAND_NONE 0
 #define COMMAND_TURN_LEFT 1

@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "i2c_interface.h"
-#include "Wire.h"
+#include "RPiI2C.h"
 
 uint8_t *I2cInterface::raw_data;
 uint8_t I2cInterface::raw_data_size;

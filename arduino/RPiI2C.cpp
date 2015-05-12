@@ -19,6 +19,8 @@
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
 */
 
+#include <Arduino.h>
+
 extern "C" {
   #include <stdlib.h>
   #include <string.h>
@@ -26,7 +28,7 @@ extern "C" {
   #include "twi.h"
 }
 
-#include "Wire.h"
+#include "RPiI2C.h"
 
 // Initialize Class Variables //////////////////////////////////////////////////
 
@@ -263,6 +265,7 @@ void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
   rxBufferLength = numBytes;
   // alert user program
   user_onReceive(numBytes);
+  delay(5);
 }
 
 // behind the scenes function that is called when data is requested
