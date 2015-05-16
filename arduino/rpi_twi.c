@@ -38,11 +38,6 @@
 #include "pins_arduino.h"
 #include "rpi_twi.h"
 
-static volatile uint8_t twi_state;
-static volatile uint8_t twi_slarw;
-static volatile uint8_t twi_sendStop;			// should the transaction end with a stop
-static volatile uint8_t twi_inRepStart;			// in the middle of a repeated start
-
 static void (*twi_onSlaveTransmit)(void);
 static void (*twi_onSlaveReceive)(uint8_t*, int);
 
@@ -63,11 +58,6 @@ static volatile uint8_t twi_error;
  */
 void twi_init(void)
 {
-  // initialize state
-  twi_state = TWI_READY;
-  twi_sendStop = true;		// default value
-  twi_inRepStart = false;
-  
   // activate internal pullups for twi.
   digitalWrite(SDA, 1);
   digitalWrite(SCL, 1);
@@ -96,61 +86,6 @@ void twi_setAddress(uint8_t address)
 {
   // set twi slave address (skip over TWGCE bit)
   TWAR = address << 1;
-}
-
-/* 
- * Function twi_transmit
- * Desc     fills slave tx buffer with data
- *          must be called in slave tx event callback
- * Input    data: pointer to byte array
- *          length: number of bytes in array
- * Output   1 length too long for buffer
- *          2 not slave transmitter
- *          0 ok
- */
-uint8_t twi_transmit(const uint8_t* data, uint8_t length)
-{
-  uint8_t i;
-
-  // ensure data will fit into buffer
-  if(TWI_BUFFER_LENGTH < length){
-    return 1;
-  }
-  
-  // ensure we are currently a slave transmitter
-  if(TWI_STX != twi_state){
-    return 2;
-  }
-  
-  // set length and copy data into tx buffer
-  twi_txBufferLength = length;
-  for(i = 0; i < length; ++i){
-    twi_txBuffer[i] = data[i];
-  }
-  
-  return 0;
-}
-
-/* 
- * Function twi_attachSlaveRxEvent
- * Desc     sets function called before a slave read operation
- * Input    function: callback function to use
- * Output   none
- */
-void twi_attachSlaveRxEvent( void (*function)(uint8_t*, int) )
-{
-  twi_onSlaveReceive = function;
-}
-
-/* 
- * Function twi_attachSlaveTxEvent
- * Desc     sets function called before a slave write operation
- * Input    function: callback function to use
- * Output   none
- */
-void twi_attachSlaveTxEvent( void (*function)(void) )
-{
-  twi_onSlaveTransmit = function;
 }
 
 /* 
@@ -185,9 +120,6 @@ void twi_stop(void)
   while(TWCR & _BV(TWSTO)){
     continue;
   }
-
-  // update twi state
-  twi_state = TWI_READY;
 }
 
 /* 
@@ -200,9 +132,6 @@ void twi_releaseBus(void)
 {
   // release bus
   TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT);
-
-  // update twi state
-  twi_state = TWI_READY;
 }
 
 void leds(uint8_t y, uint8_t g, uint8_t r)
@@ -222,22 +151,11 @@ void leds(uint8_t y, uint8_t g, uint8_t r)
 ISR(TWI_vect)
 {
   switch(TW_STATUS){
-    // All Master
-    case TW_START:     // sent start condition
-    case TW_REP_START: // sent repeated start condition
-      // copy device address and r/w bit to output register and ack
-      TWDR = twi_slarw;
-      twi_reply(1);
-      break;
-
-    // Slave Receiver
     case TW_SR_SLA_ACK:   // addressed, returned ack
       delayMicroseconds(10);
     case TW_SR_GCALL_ACK: // addressed generally, returned ack
     case TW_SR_ARB_LOST_SLA_ACK:   // lost arbitration, returned ack
     case TW_SR_ARB_LOST_GCALL_ACK: // lost arbitration, returned ack
-      // enter slave receiver mode
-      twi_state = TWI_SRX;
       // indicate that rx buffer can be overwritten and ack
       twi_reply(1);
       break;
@@ -275,8 +193,6 @@ ISR(TWI_vect)
     // Slave Transmitter
     case TW_ST_SLA_ACK:          // addressed, returned ack
     case TW_ST_ARB_LOST_SLA_ACK: // arbitration lost, returned ack
-      // enter slave transmitter mode
-      twi_state = TWI_STX;
       // ready the tx buffer index for iteration
       twi_txBufferIndex = 0;
       // set tx buffer length to be zero, to verify if user changes it
@@ -296,8 +212,6 @@ ISR(TWI_vect)
     case TW_ST_LAST_DATA: // received ack, but we are done already!
       // ack future responses
       twi_reply(1);
-      // leave slave receiver state
-      twi_state = TWI_READY;
       break;
 
     // All
