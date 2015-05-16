@@ -232,18 +232,19 @@ ISR(TWI_vect)
 
     // Slave Receiver
     case TW_SR_SLA_ACK:   // addressed, returned ack
+      delayMicroseconds(10);
     case TW_SR_GCALL_ACK: // addressed generally, returned ack
     case TW_SR_ARB_LOST_SLA_ACK:   // lost arbitration, returned ack
     case TW_SR_ARB_LOST_GCALL_ACK: // lost arbitration, returned ack
-      leds(0,1,0);
       // enter slave receiver mode
       twi_state = TWI_SRX;
       // indicate that rx buffer can be overwritten and ack
       twi_reply(1);
       break;
     case TW_SR_DATA_ACK:       // data received, returned ack
+      delayMicroseconds(10);
     case TW_SR_GCALL_DATA_ACK: // data received generally, returned ack
-      leds(0,1,1);
+      leds((TWDR & 1) != 0, (TWDR & 2) != 0, (TWDR & 4) != 0);
       // if there is still room in the rx buffer
       // put byte in buffer and ack
       //twi_rxBuffer[twi_rxBufferIndex++] = TWDR;
@@ -252,7 +253,6 @@ ISR(TWI_vect)
       //twi_reply(0);
       break;
     case TW_SR_STOP: // stop or repeated start condition received
-      leds(1,0,0);
       // this is where we would do clock stretching, but RPi does not support it
       //twi_stop();
       
@@ -286,7 +286,6 @@ ISR(TWI_vect)
       // get buffer reader for transmission here
       // transmit first byte from buffer, fall through
     case TW_ST_DATA_ACK: // byte sent, ack returned
-      leds(1,1,1);
       // copy data to output register
       TWDR = 0; // <-- put data here
       // if there is more to send, ack, otherwise nack
@@ -295,7 +294,6 @@ ISR(TWI_vect)
       break;
     case TW_ST_DATA_NACK: // received nack, we are done 
     case TW_ST_LAST_DATA: // received ack, but we are done already!
-      leds(1,1,1);
       // ack future responses
       twi_reply(1);
       // leave slave receiver state
@@ -304,10 +302,8 @@ ISR(TWI_vect)
 
     // All
     case TW_NO_INFO:   // no state information
-      leds(1,1,1);
       break;
     case TW_BUS_ERROR: // bus error, illegal stop/start
-      leds(1,1,1);
       twi_error = TW_BUS_ERROR;
       //twi_stop();
       break;
