@@ -51,8 +51,12 @@ uint8_t RPiSlave::handle_event(unsigned char event, unsigned char data)
 {
   switch(event)
   {
+    case TW_SR_SLA_ACK:
+      delayMicroseconds(10);
+      return 0;
     case TW_SR_DATA_ACK:
-      leds((TWDR & 1) != 0, (TWDR & 2) != 0, (TWDR & 4) != 0);
+      delayMicroseconds(10);
+      leds((data & 1) != 0, (data & 2) != 0, (data & 4) != 0);
       return 0;
     case TW_SR_DATA_NACK:
       return 1;
