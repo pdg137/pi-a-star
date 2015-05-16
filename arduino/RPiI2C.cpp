@@ -25,7 +25,7 @@ extern "C" {
   #include <stdlib.h>
   #include <string.h>
   #include <inttypes.h>
-  #include "twi.h"
+  #include "rpi_twi.h"
 }
 
 #include "RPiI2C.h"
@@ -223,7 +223,7 @@ int TwoWire::read(void)
   return value;
 }
 
-// must be called in:
+// must becalled in:
 // slave rx event callback
 // or after requestFrom(address, numBytes)
 int TwoWire::peek(void)

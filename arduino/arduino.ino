@@ -29,15 +29,6 @@ void check_command()
 
 void loop()
 {
-  if(input[0] & 1) RXLED1;
-  else RXLED0;
-  
-//  if(input[0] & 2) digitalWrite(13, HIGH);
-//  else digitalWrite(13, LOW);
-  
-  if(input[0] & 4) TXLED1;
-  else TXLED0;
-  
-  check_command();
+
 }
 

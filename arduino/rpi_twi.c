@@ -36,7 +36,7 @@
 #endif
 
 #include "pins_arduino.h"
-#include "twi.h"
+#include "rpi_twi.h"
 
 static volatile uint8_t twi_state;
 static volatile uint8_t twi_slarw;
@@ -205,12 +205,28 @@ void twi_releaseBus(void)
   twi_state = TWI_READY;
 }
 
+void leds(uint8_t y, uint8_t g, uint8_t r)
+{
+  digitalWrite(13, y);
+  if(g)
+    TXLED1;
+  else
+    TXLED0;
+    
+  if(r)
+    RXLED1;
+  else
+    RXLED0;
+}
+
 ISR(TWI_vect)
 {
   switch(TW_STATUS){
     // All Master
     case TW_START:     // sent start condition
+      leds(0,0,0);
     case TW_REP_START: // sent repeated start condition
+      leds(0,0,1);
       // copy device address and r/w bit to output register and ack
       TWDR = twi_slarw;
       twi_reply(1);
@@ -221,41 +237,40 @@ ISR(TWI_vect)
     case TW_SR_GCALL_ACK: // addressed generally, returned ack
     case TW_SR_ARB_LOST_SLA_ACK:   // lost arbitration, returned ack
     case TW_SR_ARB_LOST_GCALL_ACK: // lost arbitration, returned ack
+      leds(0,1,0);
       // enter slave receiver mode
       twi_state = TWI_SRX;
       // indicate that rx buffer can be overwritten and ack
-      twi_rxBufferIndex = 0;
       twi_reply(1);
       break;
     case TW_SR_DATA_ACK:       // data received, returned ack
     case TW_SR_GCALL_DATA_ACK: // data received generally, returned ack
+      leds(0,1,1);
       // if there is still room in the rx buffer
-      if(twi_rxBufferIndex < TWI_BUFFER_LENGTH){
-        // put byte in buffer and ack
-        twi_rxBuffer[twi_rxBufferIndex++] = TWDR;
-        twi_reply(1);
-      }else{
-        // otherwise nack
-        twi_reply(0);
-      }
+      // put byte in buffer and ack
+      //twi_rxBuffer[twi_rxBufferIndex++] = TWDR;
+      twi_reply(1);
+      // otherwise nack
+      //twi_reply(0);
       break;
     case TW_SR_STOP: // stop or repeated start condition received
-      // put a null char after data if there's room
-      if(twi_rxBufferIndex < TWI_BUFFER_LENGTH){
-        twi_rxBuffer[twi_rxBufferIndex] = '\0';
-      }
-      // sends ack and stops interface for clock stretching
-      twi_stop();
-      // callback to user defined callback
-      twi_onSlaveReceive(twi_rxBuffer, twi_rxBufferIndex);
-      // since we submit rx buffer to "wire" library, we can reset it
-      twi_rxBufferIndex = 0;
+      leds(1,0,0);
+      // this is where we would do clock stretching, but RPi does not support it
+      //twi_stop();
       
       // ack future responses and leave slave receiver state
       twi_releaseBus();
+      
+      // callback to user defined callback
+      //twi_onSlaveReceive(twi_rxBuffer, twi_rxBufferIndex);
+      
+      // since we submit rx buffer to "wire" library, we can reset it
+      twi_rxBufferIndex = 0;
+      
       break;
     case TW_SR_DATA_NACK:       // data received, returned nack
     case TW_SR_GCALL_DATA_NACK: // data received generally, returned nack
+      leds(1,0,1);
       // nack back at master
       twi_reply(0);
       break;
@@ -263,6 +278,7 @@ ISR(TWI_vect)
     // Slave Transmitter
     case TW_ST_SLA_ACK:          // addressed, returned ack
     case TW_ST_ARB_LOST_SLA_ACK: // arbitration lost, returned ack
+      leds(1,1,0);
       // enter slave transmitter mode
       twi_state = TWI_STX;
       // ready the tx buffer index for iteration
@@ -271,25 +287,19 @@ ISR(TWI_vect)
       twi_txBufferLength = 0;
       // request for txBuffer to be filled and length to be set
       // note: user must call twi_transmit(bytes, length) to do this
-      twi_onSlaveTransmit();
-      // if they didn't change buffer & length, initialize it
-      if(0 == twi_txBufferLength){
-        twi_txBufferLength = 1;
-        twi_txBuffer[0] = 0x00;
-      }
-      // transmit first byte from buffer, fall
+      // get buffer reader for transmission here
+      // transmit first byte from buffer, fall through
     case TW_ST_DATA_ACK: // byte sent, ack returned
+      leds(1,1,1);
       // copy data to output register
-      TWDR = twi_txBuffer[twi_txBufferIndex++];
+      TWDR = 0; // <-- put data here
       // if there is more to send, ack, otherwise nack
-      if(twi_txBufferIndex < twi_txBufferLength){
-        twi_reply(1);
-      }else{
-        twi_reply(0);
-      }
+      twi_reply(1);
+      // twi_reply(0);
       break;
     case TW_ST_DATA_NACK: // received nack, we are done 
     case TW_ST_LAST_DATA: // received ack, but we are done already!
+      leds(1,1,1);
       // ack future responses
       twi_reply(1);
       // leave slave receiver state
@@ -298,10 +308,12 @@ ISR(TWI_vect)
 
     // All
     case TW_NO_INFO:   // no state information
+      leds(1,1,1);
       break;
     case TW_BUS_ERROR: // bus error, illegal stop/start
+      leds(1,1,1);
       twi_error = TW_BUS_ERROR;
-      twi_stop();
+      //twi_stop();
       break;
   }
 }
