@@ -224,9 +224,7 @@ ISR(TWI_vect)
   switch(TW_STATUS){
     // All Master
     case TW_START:     // sent start condition
-      leds(0,0,0);
     case TW_REP_START: // sent repeated start condition
-      leds(0,0,1);
       // copy device address and r/w bit to output register and ack
       TWDR = twi_slarw;
       twi_reply(1);
@@ -270,7 +268,6 @@ ISR(TWI_vect)
       break;
     case TW_SR_DATA_NACK:       // data received, returned nack
     case TW_SR_GCALL_DATA_NACK: // data received generally, returned nack
-      leds(1,0,1);
       // nack back at master
       twi_reply(0);
       break;
@@ -278,7 +275,6 @@ ISR(TWI_vect)
     // Slave Transmitter
     case TW_ST_SLA_ACK:          // addressed, returned ack
     case TW_ST_ARB_LOST_SLA_ACK: // arbitration lost, returned ack
-      leds(1,1,0);
       // enter slave transmitter mode
       twi_state = TWI_STX;
       // ready the tx buffer index for iteration
