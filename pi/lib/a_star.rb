@@ -1,17 +1,20 @@
 require 'i2c'
-require_relative 'a_star_report'
-require_relative 'follow'
-require_relative 'turn'
 
 class AStar
   def initialize
     @i2c = I2C.create('/dev/i2c-1')
   end
 
-  def set_leds(red,yellow,green)
-    led = (red ? 1 : 0) +
-      (yellow ? 2 : 0 ) +
-      (green ? 4 : 0)
-    @i2c.write(20, [0,led].pack("CC"))
+  def write
+    @i2c.write(20, 1, 1, 'FrogsFrogsFrogsFrogs')
+  end
+
+  def read
+    @i2c.read(20, 20, 2)
+  end
+
+  def wait_for_return
+    while 0 == @i2c.read(20, 1)
+    end
   end
 end

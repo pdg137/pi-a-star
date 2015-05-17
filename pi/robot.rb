@@ -3,14 +3,16 @@
 $stdout.sync = $stderr.sync = true
 
 require_relative 'lib/a_star'
-require_relative 'lib/looped_maze_solver'
 
 a_star = AStar.new
 
+t=0
 while true
-  a_star.set_leds(true,false,false)
-  a_star.set_leds(false,false,true)
-  a_star.set_leds(false,false,false)
+  100.times do
+    a_star.write
+    a_star.wait_for_return
+    a_star.read
+  end
 
-#  report = a_star.get_report
+  puts 'here'
 end
