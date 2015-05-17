@@ -3,7 +3,6 @@
 $stdout.sync = $stderr.sync = true
 
 require_relative 'lib/a_star'
-require_relative 'lib/looped_maze_solver'
 
 a_star = AStar.new
 

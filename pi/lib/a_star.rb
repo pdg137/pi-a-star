@@ -1,7 +1,4 @@
 require 'i2c'
-require_relative 'a_star_report'
-require_relative 'follow'
-require_relative 'turn'
 
 class AStar
   def initialize
