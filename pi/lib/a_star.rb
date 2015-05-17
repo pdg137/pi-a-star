@@ -12,6 +12,10 @@ class AStar
     led = (red ? 1 : 0) +
       (yellow ? 2 : 0 ) +
       (green ? 4 : 0)
-    @i2c.write(20, [0,led].pack("CC"))
+    @i2c.write(20, [led].pack("C"))
+  end
+
+  def read
+    @i2c.read(20, 5)
   end
 end
