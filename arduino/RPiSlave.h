@@ -1,3 +1,8 @@
+static unsigned char CMD_STATUS=0;
+static unsigned char CMD_STATUS_LOCK=2;
+static unsigned char CMD_STATUS_CALL=0;
+static unsigned char CMD_STATUS_RETURN=1;
+
 class RPiSlave
 {
   public:
@@ -6,4 +11,12 @@ class RPiSlave
   static void ack();
   static void nack();
   static unsigned char handle_event(unsigned char event, unsigned char data);
+  static unsigned char getByte(unsigned char index);
+  static void setByte(unsigned char index, unsigned char value);
+  
+  /* Check for a command and return the command # if we are being called. */
+  static unsigned char checkForCommand();
+  
+  /* Return from a command */
+  static void commandReturn();
 };
