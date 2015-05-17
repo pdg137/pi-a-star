@@ -60,8 +60,9 @@ uint8_t RPiSlave::handle_event(unsigned char event, unsigned char data)
       return 0;
     case TW_SR_DATA_NACK:
       return 1;
+    case TW_ST_SLA_ACK:
     case TW_ST_DATA_ACK:
-      TWDR = 0; // put data here
+      TWDR = 5; // put data here
   }
   
   return 0; // default - ACK
