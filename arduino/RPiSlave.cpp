@@ -157,6 +157,7 @@ uint8_t RPiSlave::handle_event(unsigned char event)
     /*** Slave transmitter mode ***/
     case TW_ST_SLA_ACK: // addressed and ACKed
     case TW_ST_DATA_ACK: // transmitted a byte and got ACK -> transmit the next byte and ACK 
+      rpi_delay();
       read_and_increment();
       break;
     case TW_ST_DATA_NACK: // transmitted a byte and got NACK -> done sending
@@ -169,8 +170,7 @@ uint8_t RPiSlave::handle_event(unsigned char event)
       // ideally we would not change TWCR here, but our code will ACK
       break;
     case TW_BUS_ERROR: // error on the bus - set TWSTO and TWINT and ACK
-      TWCR = (1<<TWSTO) | (1<<TWINT) | (1<<TWEA);
-      RXLED1;
+      TWCR = (1<<TWEN) | (1<<TWSTO) | (1<<TWINT) | (1<<TWEA);
       // the hardware will now clear TWSTO automatically
       break; 
   }
