@@ -15,5 +15,7 @@ void loop()
     RPiSlave::setByte(3, tmp);
     RPiSlave::commandReturn();
   }
+  
+  digitalWrite(13, millis() % 256 < 128);
 }
 
