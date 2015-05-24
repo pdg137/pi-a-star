@@ -8,6 +8,14 @@ void setup()
 
 void loop()
 {
-
+  if(1 == RPiSlave::checkForCommand())
+  {
+    unsigned char tmp = RPiSlave::getByte(2);
+    RPiSlave::setByte(2, RPiSlave::getByte(3));
+    RPiSlave::setByte(3, tmp);
+    RPiSlave::commandReturn();
+  }
+  
+  digitalWrite(13, millis() % 256 < 128);
 }
 
