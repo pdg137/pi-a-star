@@ -6,13 +6,18 @@ require_relative 'lib/a_star'
 
 a_star = AStar.new
 
-t=0
-while true
-  100.times do
-    a_star.write
-    a_star.wait_for_return
-    a_star.read
-  end
+400.times do |x|
+  a_star.set_motors(x,x)
+end
+sleep 0.5
+400.times do |x|
+  a_star.set_motors(400-x,400-x)
+end
 
-  puts 'here'
+400.times do |x|
+  a_star.set_motors(-x,-x)
+end
+sleep 0.5
+400.times do |x|
+  a_star.set_motors(-400+x,-400+x)
 end
