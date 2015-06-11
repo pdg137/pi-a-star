@@ -7,7 +7,7 @@ callback_taking_byte slave_receive_byte;
 callback_returning_byte slave_transmit_byte;
 callback_no_data slave_start;
 callback_no_data slave_stop;
-    
+
 void FastSlaveTWI::init(unsigned char address, unsigned char set_rpi_delay_us,
     callback_taking_byte my_slave_receive_byte,
     callback_returning_byte my_slave_transmit_byte,

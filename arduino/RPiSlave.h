@@ -10,6 +10,7 @@ class RPiSlave
   /* Initialize slave; do not respond to general calls. */
   static void init(unsigned char address);
   static unsigned char getByte(unsigned char index);
+  static short getInt16(unsigned char index);
   static void setByte(unsigned char index, unsigned char value);
   
   /* Check for a command and return the command # if we are being called. */

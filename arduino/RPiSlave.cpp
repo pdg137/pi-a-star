@@ -11,6 +11,11 @@ unsigned char RPiSlave::getByte(unsigned char index)
   return data[index];
 }
 
+short RPiSlave::getInt16(unsigned char index)
+{
+  return *(short *)&data[index];
+}
+
 void RPiSlave::setByte(unsigned char index, unsigned char value)
 {
   data[index] = value;
