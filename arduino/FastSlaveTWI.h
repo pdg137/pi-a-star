@@ -1,26 +1,31 @@
-typedef void (*callback_taking_byte)(unsigned char b);
-typedef unsigned char (*callback_returning_byte)();
-typedef void (*callback_no_data)();
-
+#pragma once
+#include <inttypes.h>
 
 class FastSlaveTWI
 {
+public:
+
+  class Slave {
   public:
-  /* Initialize slave; do not respond to general calls. */
-  static void init(unsigned char address, unsigned char rpi_delay_us,
-    callback_taking_byte slave_receive_byte,
-    callback_returning_byte slave_transmit_byte,
-    callback_no_data slave_start,
-    callback_no_data slave_stop);
-  static void ack();
-  static void nack();
-  static unsigned char handle_event(unsigned char event);
-  static unsigned char getByte(unsigned char index);
-  static void setByte(unsigned char index, unsigned char value);
+    virtual void receive(uint8_t b) = 0;
+    virtual uint8_t transmit() = 0;
+    virtual void start() = 0;
+    virtual void stop() = 0;
+  };
+
+  /* Initialize slave on a specific address; do not respond to general calls. */
+  static void init(uint8_t address, Slave &slave);
+  static uint8_t handle_event(uint8_t event);
+  static uint8_t getByte(uint8_t index);
+  static void setByte(uint8_t index, uint8_t value);
   
   /* Check for a command and return the command # if we are being called. */
-  static unsigned char checkForCommand();
+  static uint8_t checkForCommand();
   
   /* Indicate that we are done processing a command. */
   static void commandReturn();
+
+  /* These are used internally */
+  static void ack();
+  static void nack();
 };

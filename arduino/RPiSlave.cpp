@@ -5,6 +5,7 @@
 char data[256] = "Hello, world!";
 unsigned char index;
 unsigned char index_set = 0;
+RPiSlave::Slave rpi_slave_instance;
 
 unsigned char RPiSlave::getByte(unsigned char index)
 {
@@ -57,8 +58,15 @@ void call_if_locked_for_command()
     data[CMD_STATUS] = CMD_STATUS_CALL;
 }
 
-void slave_receive_byte(unsigned char b)
+// delay to accomodate the Broadcom I2C bug.
+void RPiSlave::Slave::piDelay()
 {
+  delayMicroseconds(10);
+}
+
+void RPiSlave::Slave::receive(unsigned char b)
+{
+  piDelay();
   if(!index_set)
   {
     index = b;
@@ -72,24 +80,24 @@ void slave_receive_byte(unsigned char b)
   }
 }
 
-void slave_start()
+void RPiSlave::Slave::start()
 {
+  piDelay();
   reset_index();
 }
 
-void slave_stop()
+void RPiSlave::Slave::stop()
 {
   call_if_locked_for_command();
 }
 
-unsigned char slave_transmit_byte()
+unsigned char RPiSlave::Slave::transmit()
 {
+  piDelay();
   return data[index++];
 }
   
 void RPiSlave::init(unsigned char address)
 {
-  FastSlaveTWI::init(address, 10,
-    slave_receive_byte, slave_transmit_byte,
-    slave_start, slave_stop);
+  FastSlaveTWI::init(address, rpi_slave_instance);
 }

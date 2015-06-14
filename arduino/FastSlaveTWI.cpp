@@ -2,24 +2,11 @@
 #include "FastSlaveTWI.h"
 #include <util/twi.h>
 
-unsigned char rpi_delay_us;
-callback_taking_byte slave_receive_byte;
-callback_returning_byte slave_transmit_byte;
-callback_no_data slave_start;
-callback_no_data slave_stop;
+FastSlaveTWI::Slave *slave;
 
-void FastSlaveTWI::init(unsigned char address, unsigned char set_rpi_delay_us,
-    callback_taking_byte my_slave_receive_byte,
-    callback_returning_byte my_slave_transmit_byte,
-    callback_no_data my_slave_start,
-    callback_no_data my_slave_stop)
+void FastSlaveTWI::init(unsigned char address, Slave &my_slave)
 {
-  slave_receive_byte = my_slave_receive_byte;
-  slave_transmit_byte = my_slave_transmit_byte;
-  slave_start = my_slave_start;
-  slave_stop = my_slave_stop;
-  
-  rpi_delay_us = set_rpi_delay_us;
+  slave = &my_slave;
   TWAR = address << 1;
   digitalWrite(SDA, 1);
   digitalWrite(SCL, 1);
@@ -51,12 +38,6 @@ void FastSlaveTWI::nack()
     | (1<<TWINT); // clear interrupt flag
 }
 
-// delay to accomodate the Broadcom I2C bug.
-void rpi_delay()
-{
-  delayMicroseconds(rpi_delay_us);
-}
-
 uint8_t FastSlaveTWI::handle_event(unsigned char event)
 {
   // See the ATmega32U4 datasheet for a list of I2C states and responses.
@@ -65,24 +46,21 @@ uint8_t FastSlaveTWI::handle_event(unsigned char event)
   {
     /*** Slave receiver mode ***/
     case TW_SR_SLA_ACK: // addressed and ACKed -> ACK next data byte
-      rpi_delay();
-      slave_start();
+      slave->start();
       break;
     case TW_SR_DATA_ACK: // received a data byte and ACKed -> ACK next byte
-      rpi_delay();
-      slave_receive_byte(TWDR);
+      slave->receive(TWDR);
       break;
     case TW_SR_DATA_NACK: // received data, NACKed - should never happen - go back to ACK
       break;
     case TW_SR_STOP: // A STOP or repeated START - nothing to do here but ACK
-      slave_stop();
+      slave->stop();
       break;
       
     /*** Slave transmitter mode ***/
     case TW_ST_SLA_ACK: // addressed and ACKed
     case TW_ST_DATA_ACK: // transmitted a byte and got ACK -> transmit the next byte and ACK 
-      rpi_delay();
-      TWDR = slave_transmit_byte();
+      TWDR = slave->transmit();
       break;
     case TW_ST_DATA_NACK: // transmitted a byte and got NACK -> done sending
       break;
