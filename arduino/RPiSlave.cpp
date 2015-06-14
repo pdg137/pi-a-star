@@ -33,26 +33,6 @@ void RPiSlave::commandReturn()
   data[CMD_STATUS] = CMD_STATUS_RETURN;
 }
 
-void RPiSlave::resetIndex()
-{
-  index = 0; // go to the beginning of the array
-  index_set = 0;
-}
-
-// Write the lock value to status if we are about to write a command.
-void RPiSlave::lockIfWritingCommand()
-{
-  if(index < 128)
-    data[CMD_STATUS] = CMD_STATUS_LOCK;
-}
-
-// Sets the status to "call" if it is in "lock".
-void RPiSlave::callIfLockedForCommand()
-{
-  if(CMD_STATUS_LOCK == data[0])
-    data[CMD_STATUS] = CMD_STATUS_CALL;
-}
-
 // delay to accomodate the Broadcom I2C bug.
 void RPiSlave::piDelay()
 {
@@ -69,21 +49,28 @@ void RPiSlave::receive(unsigned char b)
   }
   else
   {
-    lockIfWritingCommand();
+    // Write the data to the buffer
     data[index] = b;
     index ++;
+
+    // Write the lock value to status if we wrote to the command area.
+    if(index < 128)
+      data[CMD_STATUS] = CMD_STATUS_LOCK;
   }
 }
 
 void RPiSlave::start()
 {
   piDelay();
-  resetIndex();
+  index = 0; // go to the beginning of the array
+  index_set = 0;
 }
 
 void RPiSlave::stop()
 {
-  callIfLockedForCommand();
+  // Sets the status to "call" if it is in "lock".
+  if(CMD_STATUS_LOCK == data[0])
+    data[CMD_STATUS] = CMD_STATUS_CALL;
 }
 
 unsigned char RPiSlave::transmit()

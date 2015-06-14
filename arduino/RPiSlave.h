@@ -39,8 +39,4 @@ private:
   char data[256];
   unsigned char index;
   unsigned char index_set = 0;
-
-  void resetIndex();
-  void lockIfWritingCommand();
-  void callIfLockedForCommand();
 };
