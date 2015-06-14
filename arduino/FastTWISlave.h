@@ -10,21 +10,12 @@ public:
   virtual void start() = 0;
   virtual void stop() = 0;
 
-  // The following are low-level static methods:
-
   /* Initialize slave on a specific address; do not respond to general calls. */
   static void init(uint8_t address, FastTWISlave &slave);
-  static uint8_t handle_event(uint8_t event);
-  static uint8_t getByte(uint8_t index);
-  static void setByte(uint8_t index, uint8_t value);
-  
-  /* Check for a command and return the command # if we are being called. */
-  static uint8_t checkForCommand();
-  
-  /* Indicate that we are done processing a command. */
-  static void commandReturn();
 
-  /* These are used internally */
+  /* Low-level static methods not meant to be called by users. */
+  static uint8_t handleEvent(uint8_t event);
   static void ack();
   static void nack();
+  static void clearBusError();
 };

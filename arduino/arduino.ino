@@ -4,28 +4,24 @@
 #include "motors.h"
 
 Motors motors;
+RPiSlave rpi_slave;
 
 void setup()
 {
   motors.setup(16,15,4);
   pinMode(13, OUTPUT);
-  RPiSlave::init(20);
+  rpi_slave.init(20);
   delay(1000);
 }
 
 void loop()
 {
   unsigned char tmp;
-  switch(RPiSlave::checkForCommand())
+  switch(rpi_slave.checkForCommand())
   {
-  case 1:
-    tmp = RPiSlave::getByte(2);
-    RPiSlave::setByte(2, RPiSlave::getByte(3));
-    RPiSlave::setByte(3, tmp);
-    RPiSlave::commandReturn();
-    break;
   case 2:
-    motors.set(RPiSlave::getInt16(2),RPiSlave::getInt16(4));
+    motors.set(rpi_slave.getInt16(2),rpi_slave.getInt16(4));
+    rpi_slave.commandReturn();
     break;
   }
   

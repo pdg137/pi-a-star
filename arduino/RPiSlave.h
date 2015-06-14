@@ -17,15 +17,30 @@ public:
   virtual void start();
   virtual void stop();
 
-  /* Initialize slave; do not respond to general calls. */
-  static void init(unsigned char address);
-  static unsigned char getByte(unsigned char index);
-  static short getInt16(unsigned char index);
-  static void setByte(unsigned char index, unsigned char value);
+  /* Initialize the slave on a given address. */
+  void init(unsigned char address);
+
+  /* Get a byte from the buffer */
+  unsigned char getByte(unsigned char index);
+
+  /* Get an int from the buffer */
+  short getInt16(unsigned char index);
+
+  /* Set a byte in the buffer */
+  void setByte(unsigned char index, unsigned char value);
   
-  /* Check for a command and return the command # if we are being called. */
-  static unsigned char checkForCommand();
+  /* Check for a command from RPi and return the command # if we are being called. */
+  unsigned char checkForCommand();
   
-  /* Indicate that we are done processing a command. */
-  static void commandReturn();
+  /* Indicate to the RPi that we are done processing a command. */
+  void commandReturn();
+
+private:
+  char data[256];
+  unsigned char index;
+  unsigned char index_set = 0;
+
+  void resetIndex();
+  void lockIfWritingCommand();
+  void callIfLockedForCommand();
 };

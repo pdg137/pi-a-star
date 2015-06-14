@@ -2,11 +2,6 @@
 #include "RpiSlave.h"
 #include "FastTWISlave.h"
 
-char data[256] = "Hello, world!";
-unsigned char index;
-unsigned char index_set = 0;
-RPiSlave rpi_slave_instance;
-
 unsigned char RPiSlave::getByte(unsigned char index)
 {
   return data[index];
@@ -38,21 +33,21 @@ void RPiSlave::commandReturn()
   data[CMD_STATUS] = CMD_STATUS_RETURN;
 }
 
-void reset_index()
+void RPiSlave::resetIndex()
 {
   index = 0; // go to the beginning of the array
   index_set = 0;
 }
 
 // Write the lock value to status if we are about to write a command.
-void lock_if_writing_command()
+void RPiSlave::lockIfWritingCommand()
 {
   if(index < 128)
     data[CMD_STATUS] = CMD_STATUS_LOCK;
 }
 
 // Sets the status to "call" if it is in "lock".
-void call_if_locked_for_command()
+void RPiSlave::callIfLockedForCommand()
 {
   if(CMD_STATUS_LOCK == data[0])
     data[CMD_STATUS] = CMD_STATUS_CALL;
@@ -74,7 +69,7 @@ void RPiSlave::receive(unsigned char b)
   }
   else
   {
-    lock_if_writing_command();
+    lockIfWritingCommand();
     data[index] = b;
     index ++;
   }
@@ -83,12 +78,12 @@ void RPiSlave::receive(unsigned char b)
 void RPiSlave::start()
 {
   piDelay();
-  reset_index();
+  resetIndex();
 }
 
 void RPiSlave::stop()
 {
-  call_if_locked_for_command();
+  callIfLockedForCommand();
 }
 
 unsigned char RPiSlave::transmit()
@@ -99,5 +94,5 @@ unsigned char RPiSlave::transmit()
   
 void RPiSlave::init(unsigned char address)
 {
-  FastTWISlave::init(address, rpi_slave_instance);
+  FastTWISlave::init(address, *this);
 }
