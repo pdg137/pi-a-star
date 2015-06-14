@@ -2,7 +2,7 @@
 #include "FastTWISlave.h"
 #include <util/twi.h>
 
-FastTWISlave *slave;
+static FastTWISlave *slave;
 
 void FastTWISlave::init(unsigned char address, FastTWISlave &my_slave)
 {
