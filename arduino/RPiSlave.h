@@ -1,5 +1,5 @@
 #pragma once
-#include "FastSlaveTWI.h"
+#include "FastTWISlave.h"
 
 static unsigned char CMD_STATUS=0;
 static unsigned char CMD_NUMBER=1;
@@ -7,18 +7,15 @@ static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=0;
 static unsigned char CMD_STATUS_RETURN=1;
 
-class RPiSlave
+class RPiSlave: public FastTWISlave
 {
-public:
+  void piDelay();
 
-  class Slave: public FastSlaveTWI::Slave {
-    void piDelay();
-  public:
-    virtual void receive(uint8_t b);
-    virtual uint8_t transmit();
-    virtual void start();
-    virtual void stop();
-  };
+public:
+  virtual void receive(uint8_t b);
+  virtual uint8_t transmit();
+  virtual void start();
+  virtual void stop();
 
   /* Initialize slave; do not respond to general calls. */
   static void init(unsigned char address);

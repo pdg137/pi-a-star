@@ -1,10 +1,10 @@
 #include "Arduino.h"
-#include "FastSlaveTWI.h"
+#include "FastTWISlave.h"
 #include <util/twi.h>
 
-FastSlaveTWI::Slave *slave;
+FastTWISlave *slave;
 
-void FastSlaveTWI::init(unsigned char address, Slave &my_slave)
+void FastTWISlave::init(unsigned char address, FastTWISlave &my_slave)
 {
   slave = &my_slave;
   TWAR = address << 1;
@@ -15,13 +15,13 @@ void FastSlaveTWI::init(unsigned char address, Slave &my_slave)
 
 ISR(TWI_vect)
 {
-  if(FastSlaveTWI::handle_event(TWSR))
-    FastSlaveTWI::nack();
+  if(FastTWISlave::handle_event(TWSR))
+    FastTWISlave::nack();
   else
-    FastSlaveTWI::ack();
+    FastTWISlave::ack();
 }
 
-void FastSlaveTWI::ack()
+void FastTWISlave::ack()
 {
   TWCR = 
     (1<<TWEN)    // enable TWI
@@ -30,7 +30,7 @@ void FastSlaveTWI::ack()
     | (1<<TWEA); // ACK
 }
 
-void FastSlaveTWI::nack()
+void FastTWISlave::nack()
 {
   TWCR = 
     (1<<TWEN)     // enable TWI
@@ -38,7 +38,7 @@ void FastSlaveTWI::nack()
     | (1<<TWINT); // clear interrupt flag
 }
 
-uint8_t FastSlaveTWI::handle_event(unsigned char event)
+uint8_t FastTWISlave::handle_event(unsigned char event)
 {
   // See the ATmega32U4 datasheet for a list of I2C states and responses.
   // We are ignoring any master-related states and general calls.

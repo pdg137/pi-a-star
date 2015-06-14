@@ -1,11 +1,11 @@
 #include "Arduino.h"
 #include "RpiSlave.h"
-#include "FastSlaveTWI.h"
+#include "FastTWISlave.h"
 
 char data[256] = "Hello, world!";
 unsigned char index;
 unsigned char index_set = 0;
-RPiSlave::Slave rpi_slave_instance;
+RPiSlave rpi_slave_instance;
 
 unsigned char RPiSlave::getByte(unsigned char index)
 {
@@ -59,12 +59,12 @@ void call_if_locked_for_command()
 }
 
 // delay to accomodate the Broadcom I2C bug.
-void RPiSlave::Slave::piDelay()
+void RPiSlave::piDelay()
 {
   delayMicroseconds(10);
 }
 
-void RPiSlave::Slave::receive(unsigned char b)
+void RPiSlave::receive(unsigned char b)
 {
   piDelay();
   if(!index_set)
@@ -80,18 +80,18 @@ void RPiSlave::Slave::receive(unsigned char b)
   }
 }
 
-void RPiSlave::Slave::start()
+void RPiSlave::start()
 {
   piDelay();
   reset_index();
 }
 
-void RPiSlave::Slave::stop()
+void RPiSlave::stop()
 {
   call_if_locked_for_command();
 }
 
-unsigned char RPiSlave::Slave::transmit()
+unsigned char RPiSlave::transmit()
 {
   piDelay();
   return data[index++];
@@ -99,5 +99,5 @@ unsigned char RPiSlave::Slave::transmit()
   
 void RPiSlave::init(unsigned char address)
 {
-  FastSlaveTWI::init(address, rpi_slave_instance);
+  FastTWISlave::init(address, rpi_slave_instance);
 }
