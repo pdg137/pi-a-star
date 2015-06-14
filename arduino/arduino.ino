@@ -1,3 +1,5 @@
+#include <Servo.h>
+
 #include "RPiSlave.h"
 #include "motors.h"
 
@@ -5,7 +7,7 @@ Motors motors;
 
 void setup()
 {
-  motors.setup(16,15);
+  motors.setup(16,15,4);
   pinMode(13, OUTPUT);
   RPiSlave::init(20);
   delay(1000);
