@@ -7,11 +7,25 @@ static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=0;
 static unsigned char CMD_STATUS_RETURN=1;
 
+template <class T>
+class Cmd {
+public:
+  static bool run(const void *args)
+  {
+    ((T *)args)->run();
+  }
+};
+
+#define SlaveCommand(name, args) struct __attribute__ ((__packed__)) name {args void run();};
+
 class RPiSlave: public FastTWISlave
 {
   void piDelay();
 
 public:
+  virtual void handleSlaveCommand(uint8_t cmd, const void *args);
+  void loop();
+
   virtual void receive(uint8_t b);
   virtual uint8_t transmit();
   virtual void start();
@@ -25,6 +39,8 @@ public:
 
   /* Get a pointer to a string starting at a given position */
   const char *getString(unsigned char index); 
+
+  const char *getArguments() { return getString(2); }
 
   /* Get an int from the buffer */
   short getInt16(unsigned char index);

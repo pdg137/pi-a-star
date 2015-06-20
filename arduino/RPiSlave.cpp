@@ -88,3 +88,13 @@ void RPiSlave::init(unsigned char address)
 {
   FastTWISlave::init(address, *this);
 }
+
+void RPiSlave::loop()
+{
+  if(uint8_t cmd = checkForCommand())
+  {
+    const void *args = getArguments();
+    handleSlaveCommand(cmd, args);
+    commandReturn();
+  }
+}
