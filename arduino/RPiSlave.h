@@ -23,6 +23,9 @@ public:
   /* Get a byte from the buffer */
   unsigned char getByte(unsigned char index);
 
+  /* Get a pointer to a string starting at a given position */
+  const char *getString(unsigned char index); 
+
   /* Get an int from the buffer */
   short getInt16(unsigned char index);
 

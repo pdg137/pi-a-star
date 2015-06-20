@@ -17,6 +17,11 @@ void RPiSlave::setByte(unsigned char index, unsigned char value)
   data[index] = value;
 }
 
+const char *RPiSlave::getString(uint8_t index)
+{
+  return data + index;
+}
+
 unsigned char RPiSlave::checkForCommand()
 {
   // When the CMD_STATUS byte is set to CMD_STATUS_CALL, it means
