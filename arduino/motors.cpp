@@ -1,7 +1,11 @@
 #include <Servo.h>
+#include <FastGPIO.h>
 
 #include "Arduino.h"
 #include "motors.h"
+
+#define left_dir_pin 12
+#define right_dir_pin IO_E2
 
 Servo servo;
 
@@ -9,27 +13,27 @@ void Motors::set(int left, int right)
 {
   if(left < 0)
   {
-    digitalWrite(left_dir_pin, LOW);
+    FastGPIO::Pin<left_dir_pin>::setOutputValueHigh();
     OCR1A = min(-left, 400);
   }
   else
   {
-    digitalWrite(left_dir_pin, HIGH);
+    FastGPIO::Pin<left_dir_pin>::setOutputValueLow();
     OCR1A = min(left, 400);
   }
   
   if(right < 0)
   {
-    digitalWrite(right_dir_pin, LOW);
+    FastGPIO::Pin<right_dir_pin>::setOutputValueHigh();
     OCR1B = min(-right, 400);
   }
   else
   {
-    digitalWrite(right_dir_pin, HIGH);
+    FastGPIO::Pin<right_dir_pin>::setOutputValueLow();
     OCR1B = min(right, 400);
   }
   
-  Motors::setServo(right, left);
+  Motors::setServo(left, right);
 }
 
 void Motors::setServo(int left, int right)
@@ -62,21 +66,14 @@ void Motors::setServo(int left, int right)
   servo.write(120+(ratio-40)/640);
 }
 
-uint8_t Motors::left_dir_pin;
-uint8_t Motors::right_dir_pin;
-
-void Motors::setup(uint8_t left_dir_pin, uint8_t right_dir_pin, unsigned char servo_pin)
+void Motors::setup(unsigned char servo_pin)
 {
-  Motors::left_dir_pin = left_dir_pin;
-  Motors::right_dir_pin = right_dir_pin;
   // 20kHz PWM copied from Zumo shield library
   TCCR1A = 0b10100000;
   TCCR1B = 0b00010001;
   ICR1 = 400;
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
-  pinMode(left_dir_pin, OUTPUT);
-  pinMode(right_dir_pin, OUTPUT);
   Motors::set(0,0);
   servo.attach(servo_pin);
 }

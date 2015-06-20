@@ -1,4 +1,5 @@
 #include <Servo.h>
+#include <AStar32U4Prime.h>
 
 #include "RPiSlave.h"
 #include "motors.h"
@@ -8,7 +9,7 @@ RPiSlave rpi_slave;
 
 void setup()
 {
-  motors.setup(16,15,4);
+  motors.setup(8);
   pinMode(13, OUTPUT);
   rpi_slave.init(20);
   delay(1000);
