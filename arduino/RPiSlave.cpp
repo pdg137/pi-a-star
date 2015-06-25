@@ -2,42 +2,6 @@
 #include "RpiSlave.h"
 #include "FastTWISlave.h"
 
-unsigned char RPiSlave::getByte(unsigned char index)
-{
-  return data[index];
-}
-
-short RPiSlave::getInt16(unsigned char index)
-{
-  return *(short *)&data[index];
-}
-
-void RPiSlave::setByte(unsigned char index, unsigned char value)
-{
-  data[index] = value;
-}
-
-const char *RPiSlave::getString(uint8_t index)
-{
-  return data + index;
-}
-
-unsigned char RPiSlave::checkForCommand()
-{
-  // When the CMD_STATUS byte is set to CMD_STATUS_CALL, it means
-  // that a command has been issued by the Raspberry Pi.  The command
-  // number is stored in the CMD_NUMBER byte.  Zero, the default,
-  // means no command.
-  if(CMD_STATUS_CALL == data[CMD_STATUS])
-    return data[CMD_NUMBER];
-  return 0;
-}
-
-void RPiSlave::commandReturn()
-{
-  data[CMD_STATUS] = CMD_STATUS_RETURN;
-}
-
 // delay to accomodate the Broadcom I2C bug.
 void RPiSlave::piDelay()
 {
@@ -55,12 +19,12 @@ void RPiSlave::receive(unsigned char b)
   else
   {
     // Write the data to the buffer
-    data[index] = b;
+    ((char *)&data)[index] = b;
     index ++;
 
     // Write the lock value to status if we wrote to the command area.
     if(index < 128)
-      data[CMD_STATUS] = CMD_STATUS_LOCK;
+      data.command_status = CMD_STATUS_LOCK;
   }
 }
 
@@ -74,14 +38,14 @@ void RPiSlave::start()
 void RPiSlave::stop()
 {
   // Sets the status to "call" if it is in "lock".
-  if(CMD_STATUS_LOCK == data[0])
-    data[CMD_STATUS] = CMD_STATUS_CALL;
+  if(CMD_STATUS_LOCK == data.command_status)
+    data.command_status = CMD_STATUS_CALL;
 }
 
 unsigned char RPiSlave::transmit()
 {
   piDelay();
-  return data[index++];
+  return ((char *)&data)[index++];
 }
   
 void RPiSlave::init(unsigned char address)
@@ -91,10 +55,9 @@ void RPiSlave::init(unsigned char address)
 
 void RPiSlave::loop()
 {
-  if(uint8_t cmd = checkForCommand())
+  if(CMD_STATUS_CALL == data.command_status)
   {
-    const void *args = getArguments();
-    handleSlaveCommand(cmd, args);
-    commandReturn();
+    handleSlaveCommand(data.command_number, data.args);
+    data.command_status = CMD_STATUS_RETURN;
   }
 }

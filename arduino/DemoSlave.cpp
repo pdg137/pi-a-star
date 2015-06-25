@@ -11,25 +11,20 @@ void DemoSlave::init()
   RPiSlave::init(20);
 }
 
-SlaveCommand(LEDs, bool yellow; bool green; bool red;)
-void LEDs::run()
+void DemoSlave::LEDs::run()
 {
   ledYellow(yellow);
   ledGreen(green);
   ledRed(red);
 }
 
-SlaveCommand(Play, char notes[126];)
-
-void Play::run()
+void DemoSlave::Play::run()
 {
   buzzer.play(notes);
   while(buzzer.isPlaying());
 }
 
-SlaveCommand(SetMotors, short left; short right;)
-
-void SetMotors::run()
+void DemoSlave::SetMotors::run()
 {
   motors.set(left, right);
 }
