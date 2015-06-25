@@ -7,20 +7,25 @@ static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=0;
 static unsigned char CMD_STATUS_RETURN=1;
 
-template <class T>
-class Cmd {
-public:
-  static bool run(const void *args)
-  {
-    ((T *)args)->run();
+#define SlaveCommand(name, args) struct __attribute__ ((__packed__)) name { args void run(); }; \
+  void run ## name(const void * data) \
+  { \
+    Cmd<name>::run(data); \
   }
-};
-
-#define SlaveCommand(name, args) struct __attribute__ ((__packed__)) name { args void run(); };
 
 class RPiSlave: public FastTWISlave
 {
 private:
+
+template <class T>
+  class Cmd {
+  public:
+    static bool run(const void *args)
+    {
+      ((T *)args)->run();
+    }
+  };
+
   struct Data
   {
     uint8_t command_status, command_number;

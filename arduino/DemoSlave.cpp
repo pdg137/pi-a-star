@@ -34,13 +34,13 @@ void DemoSlave::handleSlaveCommand(uint8_t cmd, const void *args)
   switch(cmd)
   {
     case 2:
-      Cmd<SetMotors>::run(args);
+      runSetMotors(args);
       break;
     case 3:
-      Cmd<Play>::run(args);
+      runPlay(args);
       break;
     case 4:
-      Cmd<LEDs>::run(args);
+      runLEDs(args);
       break;
   }
 }
