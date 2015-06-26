@@ -3,13 +3,13 @@
 
 class DemoSlave: public RPiSlave
 {
-  SlaveCommand(SetMotors, short left; short right;);
-  SlaveCommand(Play, char notes[ARGS_LENGTH];);
-  SlaveCommand(LEDs, bool yellow; bool green; bool red;);
+  SlaveCommand(2, SetMotors, short left; short right;);
+  SlaveCommand(3, Play, char notes[ARGS_LENGTH];);
+  SlaveCommand(4, LEDs, bool yellow; bool green; bool red;);
   
 public:
-  MasterCommand(Print, 1, char message[ARGS_LENGTH];);
+  MasterCommand(1, Print, char message[ARGS_LENGTH];);
 
   virtual void init();
-  virtual void handleSlaveCommand(uint8_t cmd);
+  virtual void handleSlaveCommand();
 };

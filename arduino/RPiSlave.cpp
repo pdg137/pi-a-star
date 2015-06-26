@@ -66,7 +66,7 @@ void RPiSlave::loop()
 {
   if(CMD_STATUS_CALL == data.slaveCommand.status)
   {
-    handleSlaveCommand(data.slaveCommand.command);
+    handleSlaveCommand();
     data.slaveCommand.status = CMD_STATUS_RETURN;
   }
 }

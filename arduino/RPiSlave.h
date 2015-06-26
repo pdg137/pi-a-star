@@ -9,16 +9,17 @@ static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=1;
 static unsigned char CMD_STATUS_RETURN=0;
 
-#define SlaveCommand(name, args) struct __attribute__ ((__packed__)) name \
+#define SlaveCommand(cmd, name, args) struct __attribute__ ((__packed__)) name \
   { \
     args \
+    static const uint8_t command = cmd; \
     void run(); \
   }
 
-#define MasterCommand(name, cmd, args) struct __attribute__ ((__packed__))  name \
+#define MasterCommand(cmd, name, args) struct __attribute__ ((__packed__))  name \
   { \
     args \
-    static uint8_t command() { return cmd; } \
+    static const uint8_t command = cmd; \
   }
 
 class RPiSlave: public FastTWISlave
@@ -42,20 +43,21 @@ private:
   void piDelay();
 
 public:
-  virtual void handleSlaveCommand(uint8_t cmd);
+  virtual void handleSlaveCommand();
 
   template<class T> T *startMasterCommand()
   {
-    data.masterCommand.command = T::command();
+    data.masterCommand.command = T::command;
     return (T *)(data.masterCommand.args);
   };
 
   void runMasterCommand();
 
   template<class T>
-  void runSlaveCommand()
+  void checkCommand()
   {
-    ((T *)data.slaveCommand.args)->run();
+    if(T::command == data.slaveCommand.command)
+      ((T *)data.slaveCommand.args)->run();
   };
   
   void loop();
