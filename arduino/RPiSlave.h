@@ -9,7 +9,17 @@ static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=1;
 static unsigned char CMD_STATUS_RETURN=0;
 
-#define SlaveCommand(name, args) struct __attribute__ ((__packed__)) name { args void run(); };
+#define SlaveCommand(name, args) struct __attribute__ ((__packed__)) name \
+  { \
+    args \
+    void run(); \
+  }
+
+#define MasterCommand(name, cmd, args) struct __attribute__ ((__packed__))  name \
+  { \
+    args \
+    static uint8_t command() { return cmd; } \
+  }
 
 class RPiSlave: public FastTWISlave
 {
