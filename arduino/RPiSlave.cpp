@@ -2,10 +2,8 @@
 #include "RpiSlave.h"
 #include "FastTWISlave.h"
 
-bool RPiSlave::masterCommand(uint8_t command, void *args, size_t len)
+void RPiSlave::runMasterCommand()
 {
-  memcpy(data.masterCommand.args, args, len);
-  data.masterCommand.command = command;
   data.masterCommand.status = CMD_STATUS_CALL;
 }
 
@@ -68,7 +66,7 @@ void RPiSlave::loop()
 {
   if(CMD_STATUS_CALL == data.slaveCommand.status)
   {
-    handleSlaveCommand(data.slaveCommand.command, data.slaveCommand.args);
+    handleSlaveCommand(data.slaveCommand.command);
     data.slaveCommand.status = CMD_STATUS_RETURN;
   }
 }

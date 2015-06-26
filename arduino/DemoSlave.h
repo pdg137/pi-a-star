@@ -9,12 +9,11 @@ class DemoSlave: public RPiSlave
   
 public:
 //  MasterCommand(Print, char message[ARGS_LENGTH]);
-  struct Print { char message[ARGS_LENGTH]; };
-  bool run(Print args)
-  {
-    masterCommand(1, (void *)&args, sizeof(args));
-  }
+  struct Print {
+    char message[ARGS_LENGTH];
+    static uint8_t command() { return 1; }
+  };
 
   virtual void init();
-  virtual void handleSlaveCommand(uint8_t cmd, const void *args);
+  virtual void handleSlaveCommand(uint8_t cmd);
 };

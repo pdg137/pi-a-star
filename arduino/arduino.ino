@@ -16,7 +16,9 @@ void loop()
   slave.loop();
   if(millis() - last_print > 1000)
   {
-    slave.run(DemoSlave::Print {"Hello, world!\n"});
+    DemoSlave::Print *print = slave.startMasterCommand<DemoSlave::Print>();
+    snprintf(print->message, sizeof(print->message), "Hello, world! %ds\n", last_print/1000);
+    slave.runMasterCommand();
     last_print += 1000;
   }
 }

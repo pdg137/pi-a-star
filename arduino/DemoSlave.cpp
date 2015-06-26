@@ -29,18 +29,18 @@ void DemoSlave::SetMotors::run()
   motors.set(left, right);
 }
 
-void DemoSlave::handleSlaveCommand(uint8_t cmd, const void *args)
+void DemoSlave::handleSlaveCommand(uint8_t cmd)
 {
   switch(cmd)
   {
     case 2:
-      runSetMotors(args);
+      runSlaveCommand<SetMotors>();
       break;
     case 3:
-      runPlay(args);
+      runSlaveCommand<Play>();
       break;
     case 4:
-      runLEDs(args);
+      runSlaveCommand<LEDs>();
       break;
   }
 }
