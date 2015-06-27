@@ -9,6 +9,7 @@ void DemoSlave::init()
 {
   motors.setup(8);
   RPiSlave::init(20);
+  buzzer.play(">>l16g>>>c");
 }
 
 void DemoSlave::LEDs::run()
@@ -29,18 +30,9 @@ void DemoSlave::SetMotors::run()
   motors.set(left, right);
 }
 
-void DemoSlave::handleSlaveCommand(uint8_t cmd, const void *args)
+void DemoSlave::handleSlaveCommand()
 {
-  switch(cmd)
-  {
-    case 2:
-      Cmd<SetMotors>::run(args);
-      break;
-    case 3:
-      Cmd<Play>::run(args);
-      break;
-    case 4:
-      Cmd<LEDs>::run(args);
-      break;
-  }
+  checkCommand<SetMotors>();
+  checkCommand<Play>();
+  checkCommand<LEDs>();
 }

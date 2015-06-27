@@ -2,6 +2,11 @@
 #include "RpiSlave.h"
 #include "FastTWISlave.h"
 
+void RPiSlave::runMasterCommand()
+{
+  data.masterCommand.status = CMD_STATUS_CALL;
+}
+
 // delay to accomodate the Broadcom I2C bug.
 void RPiSlave::piDelay()
 {
@@ -23,8 +28,12 @@ void RPiSlave::receive(unsigned char b)
     index ++;
 
     // Write the lock value to status if we wrote to the command area.
-    if(index < 128)
-      data.command_status = CMD_STATUS_LOCK;
+    if(index < sizeof(CommandData))
+      data.slaveCommand.status = CMD_STATUS_LOCK;
+
+    // Wrap at the end of the buffer
+    if(index > sizeof(Data))
+      index = 0;
   }
 }
 
@@ -38,8 +47,8 @@ void RPiSlave::start()
 void RPiSlave::stop()
 {
   // Sets the status to "call" if it is in "lock".
-  if(CMD_STATUS_LOCK == data.command_status)
-    data.command_status = CMD_STATUS_CALL;
+  if(CMD_STATUS_LOCK == data.slaveCommand.status)
+    data.slaveCommand.status = CMD_STATUS_CALL;
 }
 
 unsigned char RPiSlave::transmit()
@@ -55,9 +64,9 @@ void RPiSlave::init(unsigned char address)
 
 void RPiSlave::loop()
 {
-  if(CMD_STATUS_CALL == data.command_status)
+  if(CMD_STATUS_CALL == data.slaveCommand.status)
   {
-    handleSlaveCommand(data.command_number, data.args);
-    data.command_status = CMD_STATUS_RETURN;
+    handleSlaveCommand();
+    data.slaveCommand.status = CMD_STATUS_RETURN;
   }
 }
