@@ -3,6 +3,7 @@
 
 class DemoSlave: public RPiSlave
 {
+  SlaveCommand(1, GetBatteryVoltage, unsigned short battery_voltage_mv;);
   SlaveCommand(2, SetMotors, short left; short right;);
   SlaveCommand(3, Play, char notes[ARGS_LENGTH];);
   SlaveCommand(4, LEDs, bool yellow; bool green; bool red;);
