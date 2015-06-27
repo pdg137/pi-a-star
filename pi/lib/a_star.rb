@@ -19,7 +19,7 @@ class AStar
   end
 
   def wait_for_return
-    while 0 == @i2c.read(20, 1)
+    while 0 == @i2c.read(20, 1) # <-- wrong?
     end
   end
 end
