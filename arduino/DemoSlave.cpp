@@ -12,33 +12,39 @@ void DemoSlave::init()
   buzzer.play("v10>>l16g>>>c");
 }
 
-void DemoSlave::GetBatteryVoltage::run()
+uint16_t getBatteryVoltage()
 {
-  battery_voltage_mv = readBatteryMillivoltsLV();
+  return readBatteryMillivoltsLV();
 }
 
-void DemoSlave::LEDs::run()
+void setLEDs(bool yellow, bool green, bool red)
 {
   ledYellow(yellow);
   ledGreen(green);
   ledRed(red);
 }
 
-void DemoSlave::Play::run()
+
+void playNotes(char *notes)
 {
   buzzer.play(notes);
   while(buzzer.isPlaying());
 }
 
-void DemoSlave::SetMotors::run()
+void setMotors(int16_t left, int16_t right)
 {
   motors.set(left, right);
 }
 
+void DemoSlave::masterPrint(char (&message)[ARGS_LENGTH])
+{
+  runMasterCommand(1, message);
+}
+
 void DemoSlave::handleSlaveCommand()
 {
-  checkCommand<SetMotors>();
-  checkCommand<Play>();
-  checkCommand<LEDs>();
-  checkCommand<GetBatteryVoltage>();
+  checkCommand(1,getBatteryVoltage);
+  checkCommand(2,setMotors);
+  checkCommand(3,playNotes);
+  checkCommand(4,setLEDs);
 }

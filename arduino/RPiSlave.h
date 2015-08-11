@@ -9,13 +9,6 @@ static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=1;
 static unsigned char CMD_STATUS_RETURN=0;
 
-#define SlaveCommand(cmd, name, args) struct __attribute__ ((__packed__)) name \
-  { \
-    args \
-    static const uint8_t command = cmd; \
-    void run(); \
-  }
-
 #define MasterCommand(cmd, name, args) struct __attribute__ ((__packed__))  name \
   { \
     args \
@@ -45,19 +38,85 @@ private:
 public:
   virtual void handleSlaveCommand();
 
-  template<class T> T *startMasterCommand()
+  template<typename T>
+  void runMasterCommand(int cmd, T &t)
   {
-    data.masterCommand.command = T::command;
-    return (T *)(data.masterCommand.args);
+    data.masterCommand.command = cmd;
+    memcpy(data.masterCommand.args, t, 19);
+    data.masterCommand.status = CMD_STATUS_CALL;
   };
 
-  void runMasterCommand();
-
-  template<class T>
-  void checkCommand()
+  template <typename R>
+  void checkCommand(int x, R (*slaveCommand)())
   {
-    if(T::command == data.slaveCommand.command)
-      ((T *)data.slaveCommand.args)->run();
+    if(x == data.slaveCommand.command)
+    {
+      *(R *)data.slaveCommand.args = slaveCommand();
+    }
+  };
+  
+  template <typename R, typename T>
+  void checkCommand(int x, R (*slaveCommand)(T))
+  {
+    if(x == data.slaveCommand.command)
+    {
+      *(R *)data.slaveCommand.args = slaveCommand((T)(data.slaveCommand.args));
+    }
+  };
+  
+  template <typename R, typename T, typename U>
+  void checkCommand(int x, R (*slaveCommand)(T, U))
+  {
+    struct __attribute__ ((__packed__)) args { T t; U u; };
+    if(x == data.slaveCommand.command)
+    {
+      args * a = (args *)(data.slaveCommand.args);
+      *(R *)data.slaveCommand.args = slaveCommand(a->t, a->u);
+    }
+  };
+  
+  template <typename R, typename T, typename U, typename V>
+  void checkCommand(int x, R (*slaveCommand)(T, U, V))
+  {
+    struct __attribute__ ((__packed__)) args { T t; U u; V v; };
+    if(x == data.slaveCommand.command)
+    {
+      args * a = (args *)(data.slaveCommand.args);
+      *(R *)data.slaveCommand.args = slaveCommand(a->t, a->u, a->v);
+    }
+  };
+
+  template <typename T>
+  void checkCommand(int x, void (*slaveCommand)(T))
+  {
+    if(x == data.slaveCommand.command)
+    {
+      // NOTE: this is not yet quite right
+      // (char *)(args) works, but (int)(args) wouldn't make sense
+      slaveCommand((T)(data.slaveCommand.args));
+    }
+  };
+  
+  template <typename T, typename U>
+  void checkCommand(int x, void (*slaveCommand)(T, U))
+  {
+    struct __attribute__ ((__packed__)) args { T t; U u; };
+    if(x == data.slaveCommand.command)
+    {
+      args * a = (args *)(data.slaveCommand.args);
+      slaveCommand(a->t, a->u);
+    }
+  };
+  
+  template <typename T, typename U, typename V>
+  void checkCommand(int x, void (*slaveCommand)(T, U, V))
+  {
+    struct __attribute__ ((__packed__)) args { T t; U u; V v; };
+    if(x == data.slaveCommand.command)
+    {
+      args * a = (args *)(data.slaveCommand.args);
+      slaveCommand(a->t, a->u, a->v);
+    }
   };
   
   void loop();

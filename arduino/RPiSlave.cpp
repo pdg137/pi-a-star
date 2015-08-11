@@ -2,11 +2,6 @@
 #include "RpiSlave.h"
 #include "FastTWISlave.h"
 
-void RPiSlave::runMasterCommand()
-{
-  data.masterCommand.status = CMD_STATUS_CALL;
-}
-
 // delay to accomodate the Broadcom I2C bug.
 void RPiSlave::piDelay()
 {
