@@ -22,7 +22,6 @@ private:
   {
     CommandData slaveCommand;
     CommandData masterCommand;
-    char scratch[ARGS_LENGTH];
   } data;
   unsigned char index;
   unsigned char index_set = 0;
