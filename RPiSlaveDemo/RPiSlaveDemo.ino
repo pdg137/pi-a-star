@@ -24,7 +24,6 @@ void setLEDs(bool yellow, bool green, bool red)
   ledRed(red);
 }
 
-
 void playNotes(char *notes)
 {
   buzzer.play(notes);
@@ -49,6 +48,7 @@ void checkCommands()
   slave.checkCommand(2, setMotors);
   slave.checkCommand(3, playNotes);
   slave.checkCommand(4, setLEDs);
+  slave.checkCommand(5, analogRead);
 }
 
 void loop()

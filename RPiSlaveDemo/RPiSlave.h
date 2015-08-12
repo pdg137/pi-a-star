@@ -46,13 +46,13 @@ public:
       *(R *)data.slaveCommand.args = slaveCommand();
     }
   };
-  
+
   template <typename R, typename T>
   void checkCommand(int x, R (*slaveCommand)(T))
   {
     if(x == data.slaveCommand.command)
     {
-      *(R *)data.slaveCommand.args = slaveCommand((T)(data.slaveCommand.args));
+      *(R *)data.slaveCommand.args = slaveCommand(*(T *)(data.slaveCommand.args));
     }
   };
   
@@ -78,14 +78,29 @@ public:
     }
   };
 
+  void checkCommand(int x, void (*slaveCommand)(char *))
+  {
+    if(x == data.slaveCommand.command)
+    {
+      slaveCommand((char *)data.slaveCommand.args);
+    }
+  };
+
+  template <typename T>
+  void checkCommand(int x, void (*slaveCommand)(T&))
+  {
+    if(x == data.slaveCommand.command)
+    {
+      slaveCommand(*(T *)data.slaveCommand.args);
+    }
+  };
+
   template <typename T>
   void checkCommand(int x, void (*slaveCommand)(T))
   {
     if(x == data.slaveCommand.command)
     {
-      // NOTE: this is not yet quite right
-      // (char *)(args) works, but (int)(args) wouldn't make sense
-      slaveCommand((T)(data.slaveCommand.args));
+      slaveCommand(*(T *)data.slaveCommand.args);
     }
   };
   
