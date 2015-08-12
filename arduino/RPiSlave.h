@@ -7,13 +7,7 @@ static unsigned char CMD_STATUS=0;
 static unsigned char CMD_NUMBER=1;
 static unsigned char CMD_STATUS_LOCK=2;
 static unsigned char CMD_STATUS_CALL=1;
-static unsigned char CMD_STATUS_RETURN=0;
-
-#define MasterCommand(cmd, name, args) struct __attribute__ ((__packed__))  name \
-  { \
-    args \
-    static const uint8_t command = cmd; \
-  }
+static unsigned char CMD_STATUS_DONE=0;
 
 class RPiSlave: public FastTWISlave
 {
@@ -36,7 +30,6 @@ private:
   void piDelay();
 
 public:
-  virtual void handleSlaveCommand();
 
   template<typename T>
   void runMasterCommand(int cmd, T &t)
@@ -119,7 +112,8 @@ public:
     }
   };
   
-  void loop();
+  bool commandReady();
+  void commandDone();
 
   virtual void receive(uint8_t b);
   virtual uint8_t transmit();

@@ -57,11 +57,12 @@ void RPiSlave::init(unsigned char address)
   FastTWISlave::init(address, *this);
 }
 
-void RPiSlave::loop()
+bool RPiSlave::commandReady()
 {
-  if(CMD_STATUS_CALL == data.slaveCommand.status)
-  {
-    handleSlaveCommand();
-    data.slaveCommand.status = CMD_STATUS_RETURN;
-  }
+  return (CMD_STATUS_CALL == data.slaveCommand.status);
+}
+
+void RPiSlave::commandDone()
+{
+  data.slaveCommand.status = CMD_STATUS_DONE;
 }
