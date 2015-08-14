@@ -1,33 +1,28 @@
 #!/usr/bin/python
 
-import smbus
+from a_star import AStar
 import time
-import struct
 
-bus = smbus.SMBus(1)
+a_star = AStar()
 
-def leds(red, yellow, green):
-  bytes = [4, red, yellow, green]
-  bus.write_i2c_block_data(20, 1, bytes)
-
-leds(0,0,0)
+a_star.leds(0,0,0)
 time.sleep(0.3)
-leds(1,0,0)
+a_star.leds(1,0,0)
 time.sleep(0.3)
-leds(1,1,0)
+a_star.leds(1,1,0)
 time.sleep(0.3)
-leds(0,1,1)
+a_star.leds(0,1,1)
 time.sleep(0.3)
-leds(0,0,1)
+a_star.leds(0,0,1)
 time.sleep(0.3)
-leds(0,0,0)
+a_star.leds(0,0,0)
 time.sleep(0.3)
-leds(0,0,1)
+a_star.leds(0,0,1)
 time.sleep(0.3)
-leds(0,1,1)
+a_star.leds(0,1,1)
 time.sleep(0.3)
-leds(1,1,0)
+a_star.leds(1,1,0)
 time.sleep(0.3)
-leds(1,0,0)
+a_star.leds(1,0,0)
 time.sleep(0.3)
-leds(0,0,0)
+a_star.leds(0,0,0)

@@ -11,6 +11,8 @@ def read():
   bus.write_byte(20, 2+32+2)
   for n in range(0,31):
     byte_list.append(bus.read_byte(20))
+    if byte_list[-1] == 0:
+      break
   return bytearray(byte_list).decode("utf-8")
 
 def check_command():
