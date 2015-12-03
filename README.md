@@ -20,7 +20,7 @@ ready to handle them at any time, which makes it a challenge to handle multi-byt
 My approach
 -----------
 
-The approach used in this project is to set up a way of interpreting data in the I2C shared memory region in
+The approach I used in this project was to a invent a way interpreting data in the I2C shared memory region in
 terms of commands, which are defined as functions in the main `.ino` file, with arguments translated to bytes
 using some C++ template magic.
 
