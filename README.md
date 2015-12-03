@@ -16,3 +16,12 @@ ready to handle them at any time, which makes it a challenge to handle multi-byt
   that makes reliable I2C hard to establish except at very low speeds.
 * The Arduino Wire library, which is the standard for I2C on the Arduino, is inefficient and does not allow the
   required workarounds for the I2C bug mentioned above.
+
+My approach
+-----------
+
+The approach used in this project is to set up a way of interpreting data in the I2C shared memory region in
+terms of commands, which are defined as functions in the main `.ino` file, with arguments translated to bytes
+using some C++ template magic.
+
+To make it possible work around the I2C bug, I implemented my own general-purpose I2C library `FastTWISlave` - the `RPiSlave` class extends this one, adding the delays necessary for communication with a Raspberry Pi.
