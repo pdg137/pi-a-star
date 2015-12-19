@@ -5,6 +5,9 @@
 RPiSlave slave;
 PololuBuzzer buzzer;
 AStar32U4Motors motors;
+AStar32U4ButtonA buttonA;
+AStar32U4ButtonB buttonB;
+AStar32U4ButtonC buttonC;
 
 void setup()
 {
@@ -35,35 +38,13 @@ void setMotors(int16_t left, int16_t right)
   motors.setSpeeds(left, right);
 }
 
-void masterPrint(char (&message)[ARGS_LENGTH])
-{
-  slave.runMasterCommand(1, message);
-}
-
-unsigned long last_print = 0;
-
-void checkCommands()
-{
-  slave.checkCommand(1, getBatteryVoltage);
-  slave.checkCommand(2, setMotors);
-  slave.checkCommand(3, playNotes);
-  slave.checkCommand(4, setLEDs);
-  slave.checkCommand(5, analogRead);
-}
-
 void loop()
 {
-  if(slave.commandReady())
-  {
-    checkCommands();
-    slave.commandDone();
-  }
-  if(millis() - last_print > 1000)
-  {
-    char buf[ARGS_LENGTH];
-    snprintf(buf, sizeof(buf), "Hello, world! %ds\n", last_print/1000);
-    masterPrint(buf);
-    last_print += 1000;
-  }
+  slave.updateUserBuffer();
+  setLEDs(slave.user_buffer[0],slave.user_buffer[1],slave.user_buffer[2]);
+  slave.user_buffer[3] = buttonA.isPressed();
+  slave.user_buffer[4] = buttonB.isPressed();
+  slave.user_buffer[5] = buttonC.isPressed();
+  slave.finishUserWrites();
 }
 
