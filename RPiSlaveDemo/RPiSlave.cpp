@@ -9,9 +9,10 @@
  * happening, so without the staging buffer there might never be a safe
  * time to do copies.
  * 
- * We have bool arrays to keep track of what bytes need to be copied.
- * This allows bidirectional writes.
- * 
+ * We have two additional arrays to keep track of the original values as
+ * of the last sync time, so that we know what bytes were written and need
+ * to be copied.  Without these additional arrays, bidirectional
+ * simultaneous writes would not be possible.
  * 
  */
 
