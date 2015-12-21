@@ -3,11 +3,9 @@
 #include "FastTWISlave.h"
 
 /*
- * We will have three buffers: i2c, staging, and user.  The idea is that
- * reads and writes involving i2c and user are asynchronous and slow, and
- * you can only safely copy data when there is no reading/writing
- * happening, so without the staging buffer there might never be a safe
- * time to do copies.
+ * Reads and writes involving i2c and user code are asynchronous and slow,
+ * and you can only safely access data when there is no reading/writing
+ * happening.
  * 
  * We have two additional arrays to keep track of the original values as
  * of the last sync time, so that we know what bytes were written and need

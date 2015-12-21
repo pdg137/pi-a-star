@@ -7,7 +7,7 @@ class RPiSlave: public FastTWISlave
 {
 private:
   char i2c_buffer[BUFFER_LENGTH];
-  bool i2c_buffer_old[BUFFER_LENGTH];
+  char i2c_buffer_old[BUFFER_LENGTH];
 
   char staging_buffer[BUFFER_LENGTH];
 
@@ -16,8 +16,8 @@ private:
 
   void piDelay();
 
-public:
-  bool user_buffer_old[BUFFER_LENGTH];
+public:  
+  char user_buffer_old[BUFFER_LENGTH];
   char user_buffer[BUFFER_LENGTH];
 
   void updateUserBuffer();

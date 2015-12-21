@@ -45,6 +45,7 @@ void loop()
   slave.user_buffer[3] = buttonA.isPressed();
   slave.user_buffer[4] = buttonB.isPressed();
   slave.user_buffer[5] = buttonC.isPressed();
+  setMotors(*(int16_t *)(slave.user_buffer+6), *(int16_t *)(slave.user_buffer + 8));
   slave.finishUserWrites();
 }
 
