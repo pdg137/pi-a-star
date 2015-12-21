@@ -15,11 +15,6 @@ void setup()
   buzzer.play("v10>>l16g>>>c");
 }
 
-uint16_t getBatteryVoltage()
-{
-  return readBatteryMillivoltsLV();
-}
-
 void setLEDs(bool yellow, bool green, bool red)
 {
   ledYellow(yellow);
@@ -38,14 +33,33 @@ void setMotors(int16_t left, int16_t right)
   motors.setSpeeds(left, right);
 }
 
+struct Data
+{
+  bool yellow, green, red;
+  bool buttonA, buttonB, buttonC;
+  int16_t leftMotor, rightMotor;
+  uint16_t batteryMillivolts;
+  uint16_t analog[6];
+};
+
 void loop()
 {
   slave.updateUserBuffer();
-  setLEDs(slave.user_buffer[0],slave.user_buffer[1],slave.user_buffer[2]);
-  slave.user_buffer[3] = buttonA.isPressed();
-  slave.user_buffer[4] = buttonB.isPressed();
-  slave.user_buffer[5] = buttonC.isPressed();
-  setMotors(*(int16_t *)(slave.user_buffer+6), *(int16_t *)(slave.user_buffer + 8));
+  struct Data *data = (struct Data *)slave.user_buffer;
+  
+  setLEDs(data->yellow, data->green, data->red);
+  data->buttonA = buttonA.isPressed();
+  data->buttonB = buttonB.isPressed();
+  data->buttonC = buttonC.isPressed();
+  setMotors(data->leftMotor, data->rightMotor);
+
+  data->batteryMillivolts = readBatteryMillivoltsLV();
+
+  for(uint8_t i=0; i<6; i++)
+  {
+    data->analog[i] = analogRead(i);
+  }
+  
   slave.finishUserWrites();
 }
 
