@@ -20,3 +20,9 @@ class AStar(object):
 
   def read_buttons(self):
     return self.read_unpack(3, 3, "???")
+
+  def read_battery_millivolts(self):
+    return self.read_unpack(10, 2, "H")
+
+  def read_analog(self):
+    return self.read_unpack(12, 12, "HHHHHH")

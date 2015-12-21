@@ -14,7 +14,19 @@ def hello():
 @app.route("/status.json")
 def status():
     buttons = a_star.read_buttons()
-    return json.dumps(buttons)
+    analog = a_star.read_analog()
+    battery_millivolts = a_star.read_battery_millivolts()
+    data = {
+        "buttons": buttons,
+        "battery_millivolts": battery_millivolts,
+        "analog": analog
+    }
+    return json.dumps(data)
+
+@app.route("/motors/<left>,<right>")
+def motors(left, right):
+    a_star.motors(int(left), int(right))
+    return ""
 
 if __name__ == "__main__":
     app.run(host = "0.0.0.0")
