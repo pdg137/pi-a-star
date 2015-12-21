@@ -15,5 +15,8 @@ class AStar(object):
   def leds(self, red, yellow, green):
     self.bus.write_i2c_block_data(20, 0, [red, yellow, green])
 
+  def motors(self, left, right):
+    self.bus.write_i2c_block_data(20, 6, map(ord, list(struct.pack('hh', left, right))))
+
   def read_buttons(self):
     return self.read_unpack(3, 3, "???")

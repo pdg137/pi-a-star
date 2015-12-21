@@ -1,18 +1,25 @@
 #!/usr/bin/python
 
-import smbus
+from a_star import AStar
 import time
-import struct
+import curses
+import curses.wrapper
 
-bus = smbus.SMBus(1)
+a_star = AStar()
 
-def motors(left, right):
-  bytes = [2] + map(ord, list(struct.pack('hh', left, right)))
-  bus.write_i2c_block_data(20, 1, bytes)
+def run(screen):
+  while True:
+    c = screen.getch()
+    if c == ord('w'):
+      a_star.motors(400,400)
+    elif c == ord('a'):
+      a_star.motors(-400,400)
+    elif c == ord('d'):
+      a_star.motors(400,-400)
+    elif c == ord('s'):
+      a_star.motors(-400,-400)
+    elif c == ord(' '):
+      a_star.motors(0,0)
 
-motors(400,-400)
-time.sleep(1)
-
-motors(399,399)
-time.sleep(4)
-motors(0,0)
+curses.wrapper(run)
+a_star.motors(0,0)
