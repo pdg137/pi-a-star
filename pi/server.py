@@ -33,5 +33,10 @@ def leds(led0, led1, led2):
     a_star.leds(led0, led1, led2)
     return ""
 
+@app.route("/play_notes/<notes>")
+def play_notes(notes):
+    a_star.play_notes(notes)
+    return ""
+
 if __name__ == "__main__":
     app.run(host = "0.0.0.0")

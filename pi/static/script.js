@@ -90,3 +90,8 @@ function setLeds() {
   led2 = $('#led2')[0].checked ? 1 : 0
   $.ajax({url: "leds/"+led0+","+led1+","+led2})
 }
+
+function playNotes() {
+  notes = $('#notes').val()
+  $.ajax({url: "play_notes/"+notes})
+}
