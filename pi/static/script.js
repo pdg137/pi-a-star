@@ -5,8 +5,15 @@ function init() {
   $("#joystick").bind("touchend",touchend)
 }
 
+stop_motors = true
+
 function poll() {
   $.ajax({url: "status.json"}).done(update_status)
+  if(stop_motors && !block_set_motors)
+  {
+    setMotors(0,0);
+    stop_motors = false
+  }
 }
 
 function update_status(json) {
@@ -53,12 +60,13 @@ function touchmove(e) {
   if(right_motor > 400) right_motor = 400
   if(right_motor < -400) right_motor = -400
 
+  stop_motors = false
   setMotors(left_motor, right_motor)
 }
 
 function touchend(e) {
   e.preventDefault()
-  setMotors(0,0)
+  stop_motors = true
 }
 
 block_set_motors = false
@@ -74,4 +82,11 @@ function setMotors(left, right) {
 
 function setMotorsDone() {
   block_set_motors = false
+}
+
+function setLeds() {
+  led0 = $('#led0')[0].checked ? 1 : 0
+  led1 = $('#led1')[0].checked ? 1 : 0
+  led2 = $('#led2')[0].checked ? 1 : 0
+  $.ajax({url: "leds/"+led0+","+led1+","+led2})
 }

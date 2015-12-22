@@ -28,5 +28,10 @@ def motors(left, right):
     a_star.motors(int(left), int(right))
     return ""
 
+@app.route("/leds/<int:led0>,<int:led1>,<int:led2>")
+def leds(led0, led1, led2):
+    a_star.leds(led0, led1, led2)
+    return ""
+
 if __name__ == "__main__":
     app.run(host = "0.0.0.0")
