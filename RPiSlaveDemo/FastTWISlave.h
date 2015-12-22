@@ -1,10 +1,25 @@
 #pragma once
 #include <inttypes.h>
 
+/* FastTWISlave is a basic AVR I2C slave library that is lightweight
+ * and fast.
+ *
+ * To use this library, inherit from FastTWISlave and implement the
+ * four virtual functions that specify how to receive and transmit
+ * bytes and how to handle the start and stop signals.
+ *
+ * The library does not support master mode, general calls, error
+ * states, and possibly other features of I2C - it only does the
+ * minimum required to establish communication with a master that we
+ * control.
+ */
+
 class FastTWISlave
 {
 public:
-  /* Methods for a slave to declare */
+  /* Methods for a slave to declare.  These methods will be called
+   * from the ISR, with clock stretching used to delay further bus
+   * activity until they return. */
   virtual void receive(uint8_t b) = 0;
   virtual uint8_t transmit() = 0;
   virtual void start() = 0;
