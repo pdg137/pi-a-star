@@ -5,7 +5,7 @@
 <meta content='width=device-width, initial-scale=1' name='viewport'>
 <link rel="stylesheet" media="all" href="static/main.css">
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="static/script.js"></script>
+<script src="static/script.js?7"></script>
 
 <title>Test page</title>
 </head>
@@ -15,7 +15,18 @@
 <table>
 <tr><th>Buttons</th>
 <td id="button0"></td><td id="button1"></td><td id="button2"></td></tr>
+
+<tr><th>LEDs</th>
+<td><input type="checkbox" id="led0" onchange="setLeds()"></td>
+<td><input type="checkbox" id="led1" onchange="setLeds()"></td>
+<td><input type="checkbox" id="led2" onchange="setLeds()"></td>
+</tr>
 </table>
+
+<p>
+<input type="text" id="notes" length="6" maxlength="6" value="ceg>c">
+<button onclick="playNotes()">Play</button>
+</p>
 
 <table>
 <tr><th>Battery</th><td><span id="battery_millivolts"></span> mV</td></tr>
